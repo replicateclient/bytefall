@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bytefall Linux</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        :root {
+            --bg: #13141a;
+            --surface: #1a1c24;
+            --border: #252830;
+            --text-main: #b8c0cc;
+            --text-dim: #606878;
+            --accent: #00e5ff;
+            --font-mono: 'JetBrains Mono', monospace;
+            --font-serif: "Charter", "Bitstream Charter", "Sitka Text", Cambria, serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-serif);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        code,
+        pre,
+        .mono {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            letter-spacing: -0.02em;
+        }
+
+        /* ── Sitewide grid canvas ── */
+        #grid-canvas {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 1;
+        }
+
+        header,
+        section,
+        footer,
+        .page {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Layout ── */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        header {
+            padding: 60px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* ── Nav ── */
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 80px;
+            opacity: 0;
+            animation: fadeDown 0.45s ease 0.05s forwards;
+        }
+
+        .logo {
+            font-family: var(--font-mono);
+            font-weight: 500;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .logo::after {
+            content: '_';
+            animation: blink 1.1s step-end infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .nav-links a {
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            text-decoration: none;
+            margin-left: 30px;
+            font-size: 0.85rem;
+            position: relative;
+            cursor: pointer;
+            transition: color 0.22s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -2px;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: width 0.22s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-main);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links a.active {
+            color: var(--accent);
+        }
+
+        .nav-links a.active::after {
+            width: 100%;
+            background: var(--accent);
+        }
+
+        /* ── Page system ── */
+        .page {
+            display: none;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .page.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ── Hero ── */
+        .hero {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: 40px;
+            padding: 100px 0;
+            align-items: center;
+        }
+
+        .hero-text-col {
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.22s forwards;
+        }
+
+        .hero-image-col {
+            opacity: 0;
+            animation: fadeUp 0.6s ease 0.4s forwards;
+        }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 30px;
+            color: #d8dde6;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            max-width: 480px;
+            line-height: 1.75;
+        }
+
+        .hero-meta {
+            margin-top: 40px;
+            border-left: 1px solid var(--accent);
+            padding-left: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* ── Section border line draw ── */
+        section {
+            padding: 100px 0;
+            border-top: 1px solid transparent;
+            position: relative;
+        }
+
+        section::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 0;
+            height: 1px;
+            width: 0;
+            background: var(--border);
+            transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        section.line-drawn::before {
+            width: 100%;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .col-4 {
+            grid-column: span 4;
+        }
+
+        .col-6 {
+            grid-column: span 6;
+        }
+
+        .col-8 {
+            grid-column: span 8;
+        }
+
+        .col-12 {
+            grid-column: span 12;
+        }
+
+        /* ── Scroll reveal ── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-d1 {
+            transition-delay: 0.13s;
+        }
+
+        .reveal-d2 {
+            transition-delay: 0.24s;
+        }
+
+        /* ── Image cards ── */
+        .img-placeholder {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            width: 100%;
+            transform-style: preserve-3d;
+            will-change: transform;
+            transition: transform 0.12s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            transform: scale(0.97);
+        }
+
+        .img-placeholder.visible,
+        .reveal.visible .img-placeholder {
+            transform: scale(1);
+        }
+
+        .img-placeholder img {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .img-placeholder:hover {
+            border-color: rgba(0, 229, 255, 0.4);
+            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 229, 255, 0.06);
+        }
+
+        /* ── Terminal ── */
+        .terminal {
+            background: #0e1016;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 18px 22px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+        }
+
+        .terminal::before {
+            content: '● ● ●';
+            display: block;
+            font-size: 0.52rem;
+            color: #2b3038;
+            letter-spacing: 5px;
+            margin-bottom: 14px;
+        }
+
+        .t-line {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 4px;
+            opacity: 0;
+        }
+
+        .terminal.visible .t-line:nth-child(2) {
+            animation: lineIn 0.2s ease 0.05s forwards;
+        }
+
+        .terminal.visible .t-line:nth-child(3) {
+            animation: lineIn 0.2s ease 0.35s forwards;
+        }
+
+        .terminal.visible .t-line:nth-child(4) {
+            animation: lineIn 0.2s ease 0.65s forwards;
+        }
+
+        .terminal.visible .t-line:nth-child(5) {
+            animation: lineIn 0.2s ease 0.9s forwards;
+        }
+
+        .terminal.visible .t-line:nth-child(6) {
+            animation: lineIn 0.2s ease 1.15s forwards;
+        }
+
+        @keyframes lineIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .t-prompt {
+            color: var(--accent);
+            user-select: none;
+        }
+
+        .t-cmd {
+            color: var(--text-main);
+        }
+
+        .t-out {
+            color: var(--text-dim);
+            padding-left: 18px;
+        }
+
+        .t-ok {
+            color: #4ade80;
+        }
+
+        /* ── Stack list ── */
+        .stack-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .stack-list li {
+            font-family: var(--font-mono);
+            font-size: 0.83rem;
+            color: var(--text-dim);
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border);
+            transition: color 0.18s ease, padding-left 0.18s ease;
+        }
+
+        .stack-list li:hover {
+            color: var(--text-main);
+            padding-left: 7px;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-main);
+            overflow: hidden;
+            text-decoration: none;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            font-size: 0.85rem;
+            line-height: 1;
+        }
+
+        .btn::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: var(--accent);
+            clip-path: inset(0 100% 0 0);
+            transition: clip-path 0.35s ease;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: attr(data-text);
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            clip-path: inset(0 100% 0 0);
+            transition: clip-path 0.35s ease;
+            z-index: 2;
+        }
+
+        .btn:hover::after,
+        .btn:hover::before {
+            clip-path: inset(0 0 0 0);
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg);
+            border-color: var(--accent);
+            outline: 2px solid transparent;
+            outline-offset: 0px;
+            transition: outline-color 0.25s ease, outline-offset 0.25s ease;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .btn-primary:hover {
+            color: var(--bg);
+            outline-color: var(--accent);
+            outline-offset: 4px;
+        }
+
+        .btn-primary::after {
+            background: transparent;
+        }
+
+        /* ── Spec grid ── */
+        .spec-label {
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            font-size: 0.78rem;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .spec-value {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            margin-bottom: 20px;
+            display: block;
+            color: var(--text-main);
+        }
+
+        /* ── Footer ── */
+        footer {
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--text-dim);
+        }
+
+        .hero-image-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-shot {
+            width: 125%;
+            max-width: none;
+        }
+
+        .hero-shot img {
+            width: 100%;
+            height: auto;
+        }
+
+        h2 {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--accent);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 40px;
+            color: #d8dde6;
+            letter-spacing: -0.02em;
+        }
+
+        /* ══════════════════════════════════════════
+           DOWNLOAD PAGE
+        ══════════════════════════════════════════ */
+        .download-page {
+            padding: 80px 0 120px;
+        }
+
+        .download-header {
+            margin-bottom: 60px;
+        }
+
+        .download-header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 12px;
+            color: #d8dde6;
+        }
+
+        .download-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .download-screenshot {
+            position: relative;
+        }
+
+        .download-screenshot .img-placeholder {
+            transform: scale(1);
+        }
+
+        .download-screenshot .img-placeholder img {
+            width: 100%;
+            height: auto;
+            min-height: 260px;
+            object-fit: cover;
+        }
+
+        /* placeholder when image is missing */
+        .screenshot-placeholder {
+            width: 100%;
+            aspect-ratio: 16/10;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .screenshot-placeholder svg {
+            opacity: 0.3;
+        }
+
+        .download-info {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .about-release h3 {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 14px;
+            letter-spacing: 0.05em;
+        }
+
+        .about-release p {
+            color: var(--text-dim);
+            line-height: 1.75;
+            font-size: 1rem;
+        }
+
+        .release-notes {
+            border-left: 1px solid var(--border);
+            padding-left: 20px;
+        }
+
+        .release-notes h3 {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-bottom: 14px;
+            letter-spacing: 0.05em;
+        }
+
+        .release-notes ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .release-notes ul li {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            display: flex;
+            gap: 10px;
+        }
+
+        .release-notes ul li::before {
+            content: '→';
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .download-action {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .download-btn-wrap {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .download-meta-line {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .download-meta-line span {
+            color: var(--text-main);
+        }
+
+        /* Download progress bar */
+        .download-progress {
+            display: none;
+            margin-top: 8px;
+        }
+
+        .download-progress.active {
+            display: block;
+        }
+
+        .progress-bar-wrap {
+            height: 2px;
+            background: var(--border);
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-label {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 8px;
+        }
+
+        /* ══════════════════════════════════════════
+           DOCS PAGE
+        ══════════════════════════════════════════ */
+        .docs-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 0;
+            min-height: calc(100vh - 200px);
+            padding: 60px 0 120px;
+        }
+
+        .docs-sidebar {
+            border-right: 1px solid var(--border);
+            padding-right: 32px;
+            position: sticky;
+            top: 20px;
+            align-self: start;
+        }
+
+        .docs-sidebar-title {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .docs-category {
+            margin-bottom: 24px;
+        }
+
+        .docs-category-label {
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .docs-nav-item {
+            display: block;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            padding: 6px 0 6px 12px;
+            border-left: 1px solid transparent;
+            cursor: pointer;
+            transition: color 0.18s ease, border-color 0.18s ease;
+        }
+
+        .docs-nav-item:hover {
+            color: var(--text-main);
+        }
+
+        .docs-nav-item.active {
+            color: var(--accent);
+            border-left-color: var(--accent);
+        }
+
+        .docs-content {
+            padding-left: 60px;
+        }
+
+        .docs-content h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            color: #d8dde6;
+        }
+
+        .docs-content .docs-subtitle {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .docs-body h2 {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            color: var(--accent);
+            letter-spacing: 0.05em;
+            margin-top: 40px;
+            margin-bottom: 12px;
+        }
+
+        .docs-body h3 {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: #d8dde6;
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        .docs-body p {
+            color: var(--text-dim);
+            line-height: 1.8;
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+
+        .docs-body ul {
+            margin-bottom: 16px;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .docs-body ul li {
+            font-family: var(--font-mono);
+            font-size: 0.83rem;
+            color: var(--text-dim);
+            padding: 5px 0;
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .docs-body ul li::before {
+            content: '–';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        .docs-body code {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 7px;
+            font-size: 0.82rem;
+            color: var(--accent);
+        }
+
+        .docs-body pre {
+            background: #0e1016;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px 22px;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .docs-body pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: var(--text-main);
+            font-size: 0.82rem;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .docs-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .docs-sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding-right: 0;
+                padding-bottom: 24px;
+                position: static;
+                margin-bottom: 40px;
+            }
+
+            .docs-content {
+                padding-left: 0;
+            }
+
+            .download-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 800px) {
+
+            .hero,
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .col-4,
+            .col-6,
+            .col-8 {
+                grid-column: span 1;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-shot {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <canvas id="grid-canvas"></canvas>
+
+    <header>
+        <div class="container">
+            <nav class="nav">
+                <a class="logo" onclick="navigate('home')">bytefall</a>
+                <div class="nav-links">
+                    <a onclick="scrollToSection('identity')" data-section="identity">identity</a>
+                    <a onclick="scrollToSection('environment')" data-section="environment">environment</a>
+                    <a onclick="scrollToSection('stack')" data-section="stack">stack</a>
+                    <a onclick="navigate('docs')" data-page="docs">docs</a>
+                    <a href="https://github.com/replicateclient/bytefall" target="_blank" rel="noopener">github</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ══════════ HOME PAGE ══════════ -->
+    <div id="page-home" class="page active">
+        <div id="home-header-content">
+            <div class="container">
+                <div class="hero">
+                    <div class="hero-text-col">
+                        <h1>A super light-weight workstation.</h1>
+                        <p class="hero-description">
+                            Bytefall is an opinionated linux distro built for lightning fast performance. Based on Arch
+                            btw, it
+                            only leaves what's essential.
+                        </p>
+                        <div class="hero-meta">
+                            <a class="btn btn-primary" onclick="navigate('download')" data-text="Download ISO">Download
+                                ISO</a>
+                            <a class="btn" onclick="navigate('docs')" data-text="Documentation">Documentation</a>
+                            <a class="btn" href="https://github.com/replicateclient/bytefall" target="_blank"
+                                rel="noopener" data-text="GitHub">GitHub</a>
+                        </div>
+                    </div>
+                    <div class="hero-image-col hero-image-wrap">
+                        <div class="img-placeholder hero-shot">
+                            <img src="desktop_environment_preview.png" alt="Desktop environment preview">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section id="identity">
+            <div class="container">
+                <div class="grid">
+                    <div class="col-4 reveal">
+                        <h2>Visual identity</h2>
+                        <p>Bytefall is very different from other distros. It uses a high contrast theme, a good font,
+                            and is easy to recognize. Bytefall's logo is supposed to be a transparent cube, btw</p>
+                    </div>
+                    <div class="col-8 reveal reveal-d1">
+                        <div class="hero-image-wrap">
+                            <div class="img-placeholder hero-shot">
+                                <img src="splash_screen_preview.png" alt="Splash screen preview">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="environment">
+            <div class="container">
+                <div class="grid">
+                    <div class="col-6 reveal">
+                        <div class="hero-image-wrap">
+                            <div class="img-placeholder hero-shot">
+                                <img src="terminal_branding_preview.png" alt="Terminal branding preview">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 reveal reveal-d1">
+                        <h2>System architecture</h2>
+                        <p class="section-title">The stack, kept small.</p>
+                        <p style="margin-bottom: 28px; color: var(--text-dim);">We didn't add any bloat or unneeded
+                            features in Bytefall, because Bytefall is made for optimization.</p>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 36px;">
+                            <div>
+                                <span class="spec-label">tuff?</span>
+                                <span class="spec-value">yes 🤑🫰</span>
+                                <span class="spec-label">bootloader</span>
+                                <span class="spec-value">systemd-boot / grub</span>
+                            </div>
+                            <div>
+                                <span class="spec-label">default desktop env</span>
+                                <span class="spec-value">plasma 6</span>
+                                <span class="spec-label">shell</span>
+                                <span class="spec-value">fish</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="stack">
+            <div class="container">
+                <div class="grid">
+                    <div class="col-4 reveal">
+                        <h2>Developer tools</h2>
+                        <p>Bytefall is delivered ready for systems work. The curated package set includes compilers,
+                            container runtimes, and modern terminal utilities.</p>
+                    </div>
+                    <div class="col-8 reveal reveal-d1">
+                        <ul class="stack-list">
+                            <li>gcc / clang / llvm</li>
+                            <li>rustup / go / nodejs</li>
+                            <li>python / pip</li>
+                            <li>docker / podman</li>
+                            <li>qemu / virt-manager</li>
+                            <li>neovim / tmux / code</li>
+                            <li>cmake / ninja / make</li>
+                            <li>ripgrep / fd / fzf / bat</li>
+                            <li>btop / htop / strace</li>
+                            <li>jq / yq / curl / wget</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div class="container">
+                <div class="grid">
+                    <div class="col-6 reveal">
+                        <h2>Current status</h2>
+                        <p>The project is currently refining its installer stability. Calamares is being integrated as
+                            the
+                            primary graphical path. While the system is highly stable for daily use, installation
+                            remains an
+                            area of active development.</p>
+                    </div>
+                    <div class="col-6 reveal reveal-d1">
+                        <h2>Reproducible builds</h2>
+                        <p>Bytefall is defined in code. The entire ISO build pipeline is reproducible.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="container">
+                <div class="grid">
+                    <div class="col-6">
+                        Bytefall is a test project. It is not recommended for daily use until finished.
+                    </div>
+                    <div class="col-6" style="text-align: right;">
+                        <a href="https://github.com/replicateclient/bytefall" target="_blank" rel="noopener"
+                            style="color: var(--text-dim); text-decoration: none; transition: color 0.22s ease;"
+                            onmouseover="this.style.color='var(--accent)'"
+                            onmouseout="this.style.color='var(--text-dim)'">github.com/replicateclient/bytefall</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ══════════ DOWNLOAD PAGE ══════════ -->
+    <div id="page-download" class="page">
+        <div class="container download-page">
+            <div class="download-header reveal">
+                <h1>Bytefall 0.1 Aurora</h1>
+            </div>
+
+            <div class="download-layout">
+                <div class="download-screenshot reveal">
+                    <div class="img-placeholder">
+                        <img src="desktop_environment_preview.png" alt="Bytefall 0.1 Aurora screenshot"
+                            onerror="this.parentElement.innerHTML='<div class=\'screenshot-placeholder\'><svg width=\'48\' height=\'48\' viewBox=\'0 0 48 48\' fill=\'none\' xmlns=\'http://www.w3.org/2000/svg\'><rect x=\'4\' y=\'8\' width=\'40\' height=\'32\' rx=\'3\' stroke=\'currentColor\' stroke-width=\'1.5\'/><path d=\'M4 14h40\' stroke=\'currentColor\' stroke-width=\'1.5\'/><circle cx=\'9\' cy=\'11\' r=\'1.5\' fill=\'currentColor\'/><circle cx=\'14\' cy=\'11\' r=\'1.5\' fill=\'currentColor\'/><circle cx=\'19\' cy=\'11\' r=\'1.5\' fill=\'currentColor\'/></svg><span>screenshot coming soon</span></div>'">
+                    </div>
+                </div>
+
+                <div class="download-info">
+                    <div class="about-release reveal reveal-d1">
+                        <h3>About this release</h3>
+                        <p>Aurora is the first public release of Bytefall. This ships all the customization from
+                            Bytefall, main development tools, and all the main stuff.</p>
+                    </div>
+
+                    <div class="release-notes reveal reveal-d1">
+                        <h3>What's included</h3>
+                        <ul>
+                            <li>Performance patches</li>
+                            <li>KDE Plasma desktop env with no bloat</li>
+                            <li>Full developer toolchain pre-installed</li>
+                            <li>systemd-boot and GRUB support</li>
+                            <li>Bytefall terminal branding & themes</li>
+                        </ul>
+                    </div>
+
+                    <div class="download-action reveal reveal-d2">
+                        <div class="download-btn-wrap">
+                            <button class="btn btn-primary" onclick="startDownload()" data-text="Download ISO"
+                                id="download-btn">Download ISO</button>
+                            <div class="download-meta-line">
+                                bytefall-0.1-2026.05.14-x86_64.iso
+                            </div>
+                        </div>
+                        <div class="download-progress" id="download-progress">
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar-fill" id="progress-fill"></div>
+                            </div>
+                            <div class="progress-label" id="progress-label">Preparing download...</div>
+                        </div>
+                        <div class="download-meta-line" style="margin-top: 4px;">
+                            SHA256: <span
+                                id="checksum-display">136092be695f72a1e7870aa8384dc5e0749fbbd0ef72cdba943c13f1dc048eba</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ DOCS PAGE ══════════ -->
+    <div id="page-docs" class="page">
+        <div class="container">
+            <div class="docs-layout">
+                <!-- Sidebar -->
+                <aside class="docs-sidebar">
+                    <div class="docs-sidebar-title">docs</div>
+
+                    <div class="docs-category">
+                        <div class="docs-category-label">Getting started</div>
+                        <a class="docs-nav-item" onclick="loadDoc('introduction')">Introduction</a>
+                        <a class="docs-nav-item" onclick="loadDoc('download-verify')">Download and verify</a>
+                        <a class="docs-nav-item" onclick="loadDoc('booting')">Booting</a>
+                        <a class="docs-nav-item" onclick="loadDoc('installation')">Installing</a>
+                    </div>
+
+                    <div class="docs-category">
+                        <div class="docs-category-label">Build and development</div>
+                        <a class="docs-nav-item" onclick="loadDoc('building')">Building the ISO</a>
+                        <a class="docs-nav-item" onclick="loadDoc('building-wsl')">Building on Windows</a>
+                        <a class="docs-nav-item" onclick="loadDoc('repo-layout')">Repository layout</a>
+                    </div>
+
+                    <div class="docs-category">
+                        <div class="docs-category-label">Installer and system</div>
+                        <a class="docs-nav-item" onclick="loadDoc('installer-arch')">Installer architecture</a>
+                        <a class="docs-nav-item" onclick="loadDoc('profiles')">Profiles and editions</a>
+                        <a class="docs-nav-item" onclick="loadDoc('first-boot')">First boot</a>
+                    </div>
+
+                    <div class="docs-category">
+                        <div class="docs-category-label">Theming and branding</div>
+                        <a class="docs-nav-item" onclick="loadDoc('visual-identity')">Visual identity</a>
+                        <a class="docs-nav-item" onclick="loadDoc('theme-stack')">Theme stack</a>
+                        <a class="docs-nav-item" onclick="loadDoc('wallpapers')">Wallpapers</a>
+                        <a class="docs-nav-item" onclick="loadDoc('branding-assets')">Branding assets</a>
+                    </div>
+
+                    <div class="docs-category">
+                        <div class="docs-category-label">Packages</div>
+                        <a class="docs-nav-item" onclick="loadDoc('package-philosophy')">Package philosophy</a>
+                        <a class="docs-nav-item" onclick="loadDoc('package-set')">Default package set</a>
+                    </div>
+
+                    <div class="docs-category">
+                        <div class="docs-category-label">Release</div>
+                        <a class="docs-nav-item" onclick="loadDoc('release-process')">Release process</a>
+                        <a class="docs-nav-item" onclick="loadDoc('release-checklist')">Release checklist</a>
+                        <a class="docs-nav-item" onclick="loadDoc('publishing')">Publishing</a>
+                    </div>
+
+                    <div class="docs-category">
+                        <div class="docs-category-label">Reference</div>
+                        <a class="docs-nav-item" onclick="loadDoc('important-files')">Important files</a>
+                        <a class="docs-nav-item" onclick="loadDoc('build-scripts-ref')">Build scripts</a>
+                        <a class="docs-nav-item" onclick="loadDoc('boot-modes')">Boot modes</a>
+                    </div>
+                </aside>
+
+                <!-- Content -->
+                <main class="docs-content" id="docs-content">
+                    <!-- Filled by JS -->
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ══════════════════════════════════════════
+           PAGE ROUTER
+        ══════════════════════════════════════════ */
+        const pages = ['home', 'download', 'docs'];
+        let currentPage = 'home';
+
+        function navigate(page) {
+            if (currentPage === page) return;
+
+            const old = document.getElementById('page-' + currentPage);
+            old.classList.remove('visible');
+
+            setTimeout(() => {
+                old.classList.remove('active');
+
+                currentPage = page;
+                const next = document.getElementById('page-' + page);
+                next.classList.add('active');
+
+                // force reflow then fade in
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        next.classList.add('visible');
+                    });
+                });
+
+                // update nav active states
+                document.querySelectorAll('.nav-links a[data-page]').forEach(a => {
+                    a.classList.toggle('active', a.dataset.page === page);
+                });
+
+                // scroll to top smoothly
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+                // re-run reveal observers for new page content
+                if (page === 'docs') {
+                    loadDoc('introduction');
+                }
+
+                if (page !== 'home') {
+                    setTimeout(() => {
+                        next.querySelectorAll('.reveal').forEach(el => {
+                            revealObserver.observe(el);
+                        });
+                    }, 50);
+                }
+            }, 320);
+        }
+
+        // Make home page visible immediately
+        requestAnimationFrame(() => {
+            document.getElementById('page-home').classList.add('visible');
+        });
+
+        function scrollToSection(id) {
+            if (currentPage !== 'home') {
+                navigate('home');
+                setTimeout(() => {
+                    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+                }, 420);
+            } else {
+                document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        /* ══════════════════════════════════════════
+           DOCS CONTENT
+        ══════════════════════════════════════════ */
+        const docPages = {
+            introduction: {
+                title: 'Introduction',
+                subtitle: 'What Bytefall is and why it exists.',
+                body: `
+                <h3>What Bytefall is</h3>
+                <p>Bytefall is an opinionated Arch-based Linux distribution built around KDE Plasma, a dark visual identity, and a focused desktop experience.</p>
+                <p>It is not meant to be a generic "everything for everyone" distro. Bytefall is designed to feel intentional from boot to desktop to terminal. The goal is to take the flexibility of Arch Linux and shape it into a complete workstation that already feels curated, branded, and ready to use.</p>
+                <p>Bytefall currently ships with:</p>
+                <ul>
+                    <li>Arch Linux as the base</li>
+                    <li>KDE Plasma as the desktop</li>
+                    <li><code>linux-zen</code> as the default kernel</li>
+                    <li><code>systemd</code> or GRUB as the bootloader</li>
+                    <li><code>NetworkManager</code> for networking</li>
+                    <li>Calamares for graphical installation</li>
+                    <li>a Bytefall-specific welcome flow, wallpaper system, boot branding, terminal branding, and theme stack</li>
+                </ul>
+                <h3>Why Bytefall exists</h3>
+                <p>Bytefall exists because a lot of Linux desktops are technically powerful, but visually inconsistent, overly generic, or too dependent on post-install customization.</p>
+                <p>The idea is simple: start from a strong base, keep the system reproducible, make the desktop feel cohesive, remove unnecessary clutter, and preserve power without sacrificing identity.</p>
+                <p>Instead of shipping a plain Arch KDE setup and expecting the user to do the rest, Bytefall tries to provide a complete starting point. The desktop should already feel deliberate. The terminal should already feel branded. The installer should already feel like part of the system.</p>
+                <h3>Design philosophy</h3>
+                <p><strong style="color:var(--text-main);">Opinionated over neutral.</strong> Bytefall does not try to be invisible. It chooses defaults on purpose.</p>
+                <p><strong style="color:var(--text-main);">Reproducible over improvised.</strong> System behavior should come from versioned config, build scripts, and owned assets — not from one-off tweaks.</p>
+                <p><strong style="color:var(--text-main);">Coherent over maximal.</strong> The goal is not to ship every package or every feature. The goal is to make the shipped pieces work together cleanly.</p>
+                <p><strong style="color:var(--text-main);">Desktop quality matters.</strong> The visual layer is not decoration after the real work. It is part of the product.</p>
+            `
+            },
+            'download-verify': {
+                title: 'Download and verify',
+                subtitle: 'Getting the ISO and confirming it is intact.',
+                body: `
+                <p>Bytefall releases are distributed as ISO images. A release artifact includes the ISO file, a <code>SHA256SUMS</code> file, release notes, and known issues.</p>
+                <h3>Why verify the ISO</h3>
+                <p>Checksums help confirm that the downloaded ISO is complete and unchanged. If the checksum does not match, the file should not be trusted.</p>
+                <h3>What the file name means</h3>
+                <p>A typical Bytefall ISO name looks like this:</p>
+                <pre><code>bytefall-0.1-YYYY.MM.DD-x86_64.iso</code></pre>
+                <p>This encodes the distro name, the release line, the build date, and the architecture.</p>
+                <h3>Verification</h3>
+                <p>On Linux:</p>
+                <pre><code>sha256sum bytefall-0.1-YYYY.MM.DD-x86_64.iso
+cat SHA256SUMS</code></pre>
+                <p>On Windows PowerShell:</p>
+                <pre><code>Get-FileHash .\\bytefall-0.1-YYYY.MM.DD-x86_64.iso -Algorithm SHA256
+Get-Content .\\SHA256SUMS</code></pre>
+                <p>Compare the values exactly.</p>
+            `
+            },
+            booting: {
+                title: 'Booting',
+                subtitle: 'Getting into the live environment.',
+                body: `
+                <p>Bytefall boots into a live environment before installation. The ISO currently supports BIOS and UEFI boot.</p>
+                <p>The live environment lets you test hardware compatibility, preview the desktop, launch the installer, and inspect the system before committing to install.</p>
+                <h3>What happens on boot</h3>
+                <p>After the bootloader stage, Bytefall enters its branded boot flow, then starts KDE Plasma in a live session. From there, the live session opens the Bytefall Welcome app.</p>
+                <h3>The welcome app</h3>
+                <p>The welcome app is the first guided step of the live environment. It handles greeting the user, collecting graphics driver preference, controlling whether the app shows on startup, and launching the installer.</p>
+                <p>In the live session, the install flow is intentionally staged here so Bytefall can collect setup choices before Calamares opens.</p>
+            `
+            },
+            installation: {
+                title: 'Installing',
+                subtitle: 'Getting Bytefall onto a machine.',
+                body: `
+                <p>Bytefall uses Calamares as its graphical installer.</p>
+                <h3>Installation flow</h3>
+                <ul>
+                    <li>boot the live ISO</li>
+                    <li>wait for it to enter the desktop environment</li>
+                    <li>in Bytefall Welcome, choose a graphics driver</li>
+                    <li>launch the installer from the desktop shortcut or the welcome app</li>
+                    <li>complete the installer steps</li>
+                    <li>reboot into the installed system</li>
+                </ul>
+                <h3>GPU selection before install</h3>
+                <p>Before the installer starts, Bytefall asks for a graphics preference. Current options are Auto, AMD, NVIDIA, and None. This happens outside the installer on purpose — it keeps the installer more stable and lets Bytefall handle graphics package logic before the graphical install begins.</p>
+                <h3>Bootloader behavior</h3>
+                <p>BIOS installs use GRUB. UEFI installs can use a more flexible path depending on installer logic and environment. Firmware mode matters: the live ISO and the installed system use related but not identical boot paths.</p>
+                <h3>After installation</h3>
+                <p>Once the install finishes, Bytefall removes live-only parts from the installed system so the target system is clean — live-only installer helpers, launcher files, temporary policy helpers, and other install-session-only behavior are all stripped out. After reboot, the installed system should behave like a normal Bytefall install rather than the live image.</p>
+            `
+            },
+            'first-boot': {
+                title: 'First boot',
+                subtitle: 'What to expect when the installed system starts.',
+                body: `
+                <h3>Live session first boot</h3>
+                <p>The live session applies several Bytefall-specific behaviors: default wallpaper selection, panel creation if needed, panel layout adjustments, launcher icon replacement, welcome app autostart, and branding assets in shell and terminal.</p>
+                <h3>Installed session first boot</h3>
+                <p>The installed system keeps the user-facing Bytefall identity, but should not keep live-only install helpers.</p>
+                <p>The installed system keeps theme defaults, wallpapers, panel defaults, shell branding, fonts, and default apps. It does not keep live-only install buttons, live installer launchers, or temporary live policy rules.</p>
+                <h3>Terminal defaults</h3>
+                <p>Fish is the default shell. Terminal identity includes Starship prompt, Fastfetch branding, Bytefall ASCII and ANSI identity, and support for Konsole and Kitty.</p>
+            `
+            },
+            building: {
+                title: 'Building the ISO',
+                subtitle: 'Compiling Bytefall from source on Arch Linux.',
+                body: `
+                <p>Bytefall is built from source through an ArchISO-based pipeline.</p>
+                <h3>Supported build environments</h3>
+                <p>Bytefall is meant to be built on Arch Linux, an Arch-based VM, or Arch Linux under WSL2. The build must happen in Linux because the tooling depends on Linux-specific features such as mounts, loop devices, squashfs handling, pacman, and boot image generation.</p>
+                <h3>Main build scripts</h3>
+                <ul>
+                    <li><code>scripts/build-bytefall-iso.sh</code></li>
+                    <li><code>scripts/build-bytefall-iso-wsl.ps1</code></li>
+                    <li><code>scripts/validate-bytefall-tree.sh</code></li>
+                    <li><code>scripts/install-build-deps.sh</code></li>
+                </ul>
+                <h3>Build process</h3>
+                <ul>
+                    <li>validate the repository tree</li>
+                    <li>stage a working ArchISO profile</li>
+                    <li>inject Bytefall configs, branding, and installer files</li>
+                    <li>reuse or refresh the persistent build root</li>
+                    <li>run <code>mkarchiso</code></li>
+                    <li>produce the ISO and checksum output</li>
+                </ul>
+                <h3>Incremental vs clean builds</h3>
+                <p>Incremental builds reuse the existing ArchISO work tree when possible. This is much faster and is useful during active iteration. Clean builds throw away the persistent build root and rebuild from scratch — slower, but the preferred path for release candidates.</p>
+                <h3>Output</h3>
+                <pre><code>out/bytefall-0.1-YYYY.MM.DD-x86_64.iso
+out/SHA256SUMS</code></pre>
+                <p>Bytefall also enforces a minimum ISO size to avoid accidentally shipping an incomplete image.</p>
+                <h3>Common build issues</h3>
+                <p><strong style="color:var(--text-main);">Changes do not appear in the ISO.</strong> The changed directory is likely not part of the incremental overlay sync, or stale data is present in the persistent work root.</p>
+                <p><strong style="color:var(--text-main);">Strange huge file counts during squashfs creation.</strong> A previous build was probably interrupted and left mounted pseudo-filesystems inside the persistent build root.</p>
+                <p><strong style="color:var(--text-main);"><code>mkarchiso</code> not found.</strong> The required Arch build dependencies are missing.</p>
+                <p><strong style="color:var(--text-main);">WSL cannot start Arch Linux.</strong> Virtualization is not enabled in firmware.</p>
+            `
+            },
+            'building-wsl': {
+                title: 'Building on Windows',
+                subtitle: 'Using WSL2 with Arch Linux to build the ISO.',
+                body: `
+                <p>Bytefall can be built from Windows using WSL2 with an Arch Linux environment. Windows is a good editing environment, but the ISO build itself still needs Linux. WSL bridges that gap by letting the repo stay on the Windows side while the actual build runs inside Arch Linux.</p>
+                <h3>How the WSL build works</h3>
+                <ul>
+                    <li>ensures an Arch WSL environment exists</li>
+                    <li>syncs the repo into a Linux build tree</li>
+                    <li>runs the normal Bytefall validation and build scripts</li>
+                    <li>copies the finished ISO back into the Windows repo output directory</li>
+                </ul>
+                <h3>Requirements</h3>
+                <p>WSL2 requires hardware virtualization to be enabled in BIOS or UEFI. If virtualization is disabled, WSL2 cannot run the Linux VM needed for the build.</p>
+                <h3>Typical WSL issues</h3>
+                <p><strong style="color:var(--text-main);">Virtualization disabled.</strong> The firmware setting for Intel VT-x, AMD-V, or SVM is off.</p>
+                <p><strong style="color:var(--text-main);">Slow builds from the wrong filesystem.</strong> Cross-filesystem builds can be slower if too much work is being done directly through mounted Windows paths instead of a Linux-side persistent work tree.</p>
+                <p><strong style="color:var(--text-main);">Stale build state.</strong> Interrupted WSL builds can leave behind background processes or stale mount state if the build is killed at the wrong time.</p>
+            `
+            },
+            'repo-layout': {
+                title: 'Repository layout',
+                subtitle: 'How the Bytefall repo is organized.',
+                body: `
+                <p>Bytefall is organized by ownership rather than by vague category.</p>
+                <ul>
+                    <li><code>apps/</code> — Bytefall-specific applications, including <code>bytefall-welcome</code></li>
+                    <li><code>archiso/</code> — the ArchISO profile: package list, ISO identity, boot modes, live root files, and live system customization hooks</li>
+                    <li><code>branding/</code> — visual assets: wallpapers, shell branding, boot branding, Plasma assets, Aurorae themes, installer branding</li>
+                    <li><code>calamares/</code> — canonical Bytefall Calamares configuration: settings, branding, module configs, post-install behavior</li>
+                    <li><code>configs/</code> — default configuration split into system-wide and user skeleton defaults: shell config, KDE config, GTK config</li>
+                    <li><code>docs/</code> — project documentation</li>
+                    <li><code>packages/</code> — package profiles and repo strategy notes</li>
+                    <li><code>repo/</code> — local pacman repository output area</li>
+                    <li><code>scripts/</code> — build, validation, packaging, and helper scripts</li>
+                </ul>
+                <p>Generated build trees are not the source of truth. If you want a change to persist, it needs to be made in the owned source files, not in generated output.</p>
+            `
+            },
+            'installer-arch': {
+                title: 'Installer architecture',
+                subtitle: 'How the install flow is wired together.',
+                body: `
+                <h3>Graphical install path</h3>
+                <p>This is the normal path users see. It consists of the live session, the Bytefall Welcome app, the Calamares installer, and post-install cleanup and boot preparation.</p>
+                <h3>Script-based base install path</h3>
+                <p>This is a lower-level install path for maintainers and manual installs, driven by <code>scripts/install-bytefall-base.sh</code>. It is useful when testing package profiles or building systems without the graphical installer path.</p>
+                <h3>Why some logic lives outside Calamares</h3>
+                <p>Not every setup choice belongs inside the installer UI. Bytefall deliberately keeps some setup decisions outside Calamares because stability matters more than stuffing every choice into one wizard page. GPU selection happens in the welcome app, bootloader selection behavior can happen before Calamares opens, and some install-profile logic remains in the script-based path. This keeps the graphical installer simpler and less fragile.</p>
+            `
+            },
+            profiles: {
+                title: 'Profiles and editions',
+                subtitle: 'The three package profiles in the script-based install path.',
+                body: `
+                <p>Bytefall currently has three package profiles in the script-based install path.</p>
+                <h3>Default Bytefall</h3>
+                <p>A lean desktop-focused install. This is the general-purpose profile with the Bytefall desktop experience but without turning the system into a giant developer toolbox.</p>
+                <h3>Dev Bytefall</h3>
+                <p>The workstation-oriented profile. This is the profile for coding, tooling, and development work. It includes the broader set of compilers, editors, runtimes, and utilities associated with the project's developer identity.</p>
+                <h3>Server Bytefall</h3>
+                <p>A minimal install path for stripped-down systems. This avoids heavy desktop-oriented behavior and is meant for simpler deployment or hosting roles.</p>
+                <p>These profiles currently belong most clearly to the script-based install path. The graphical install path is intentionally simpler right now for stability.</p>
+            `
+            },
+            'visual-identity': {
+                title: 'Visual identity',
+                subtitle: "Bytefall's visual system and Aurora release identity.",
+                body: `
+                <p>Bytefall's visual system is meant to feel cold, sharp, modern, and deliberate. The distro is built around dark backgrounds, cool accent colors, crisp contrast, a focused desktop feel, and a branded shell and boot experience.</p>
+                <p>Bytefall is not trying to look neutral. The visual layer is part of the product.</p>
+                <h3>Aurora release identity</h3>
+                <p>Bytefall 0.1 Aurora leans into a colder, night-sky-inspired tone more directly. That influences wallpapers, theme choices, boot visuals, and the general mood of the desktop.</p>
+            `
+            },
+            'theme-stack': {
+                title: 'Theme stack',
+                subtitle: "The components that make up Bytefall's default appearance.",
+                body: `
+                <p>Bytefall's current default theme stack is composed from several parts.</p>
+                <ul>
+                    <li><strong style="color:var(--text-main);">Plasma theme</strong> — <code>FairyWren-Dark</code>, controls core Plasma desktop styling. Credit to freshdoctor.</li>
+                    <li><strong style="color:var(--text-main);">Window decoration</strong> — <code>FairyWren Dark</code>, controls KWin window frames and buttons.</li>
+                    <li><strong style="color:var(--text-main);">Color scheme</strong> — <code>FairyWrenDark</code>, controls broader KDE color behavior.</li>
+                    <li><strong style="color:var(--text-main);">Icons</strong> — <code>Papirus-Dark</code>. Bytefall keeps this as the icon theme even when using FairyWren global theme components. Credit to x-varlesh-x.</li>
+                    <li><strong style="color:var(--text-main);">GTK theme</strong> — <code>Breeze-Dark</code>, used to keep non-KDE apps visually consistent.</li>
+                    <li><strong style="color:var(--text-main);">Kvantum</strong> — Bytefall ships its own Qt theming pieces where needed for consistency. Currently does not work.</li>
+                </ul>
+                <p>A "global theme" in KDE does not always mean a perfect one-package total solution. Bytefall deliberately controls individual pieces so that the final result stays consistent and does not unintentionally replace wallpapers, icons, or layout behavior.</p>
+            `
+            },
+            wallpapers: {
+                title: 'Wallpapers',
+                subtitle: 'How wallpapers are packaged and selected.',
+                body: `
+                <p>Bytefall uses wallpaper packages rather than loose images.</p>
+                <h3>Current wallpaper packs</h3>
+                <p><strong style="color:var(--text-main);">Bytefall Aurora</strong> — contains the Aurora-themed wallpapers used for the 0.1 Aurora identity.</p>
+                <p><strong style="color:var(--text-main);">Bytefall Classic</strong> — contains the standard classic Bytefall wallpaper.</p>
+                <h3>Default wallpaper behavior</h3>
+                <p>The live setup picks a default from the Aurora wallpaper set rather than using the stock Plasma wallpaper.</p>
+                <h3>Why wallpaper packaging matters</h3>
+                <p>In Plasma, wallpaper packaging affects how wallpapers are named, listed, and selected. Organizing wallpapers as proper packages keeps the desktop settings cleaner and avoids weird duplicate or confusing entries.</p>
+            `
+            },
+            'branding-assets': {
+                title: 'Branding assets',
+                subtitle: 'Where and how Bytefall branding appears.',
+                body: `
+                <p>Bytefall branding is spread across several surfaces.</p>
+                <ul>
+                    <li><strong style="color:var(--text-main);">Logo</strong> — the main SVG logo, used in desktop and installer contexts.</li>
+                    <li><strong style="color:var(--text-main);">ASCII and ANSI identity</strong> — shell-facing identity in text branding assets used by the shell login experience, fetch tools, and other terminal-facing surfaces.</li>
+                    <li><strong style="color:var(--text-main);">Boot branding</strong> — GRUB assets, Plymouth assets, and Plasma splash assets.</li>
+                    <li><strong style="color:var(--text-main);">Installer branding</strong> — Calamares has its own branding layer and should match the rest of Bytefall instead of falling back to stock visuals.</li>
+                </ul>
+            `
+            },
+            'package-philosophy': {
+                title: 'Package philosophy',
+                subtitle: 'The rule that governs what ships by default.',
+                body: `
+                <p>Bytefall follows a strict packaging rule: if a package cannot justify itself clearly, it should not ship by default.</p>
+                <p>This keeps the distro from turning into an unfocused pile of "maybe useful" software. Bytefall is curated. That means package inclusion is an active decision, not an accident.</p>
+            `
+            },
+            'package-set': {
+                title: 'Default package set',
+                subtitle: 'What ships with Bytefall and why.',
+                body: `
+                <h3>Base system</h3>
+                <p>Arch base packages, kernel and firmware, boot and filesystem tools, networking, privilege and maintenance basics.</p>
+                <h3>Desktop</h3>
+                <p>KDE Plasma, SDDM, core KDE applications, and desktop integration tools.</p>
+                <h3>Terminal and utilities</h3>
+                <p>Fast system tools: <code>ripgrep</code>, <code>fd</code>, <code>fzf</code>, <code>eza</code>, <code>bat</code>, <code>btop</code>, <code>jq</code>, <code>unzip</code>, and other archive tools.</p>
+                <h3>Development tooling</h3>
+                <p>The broader distro identity leans developer-friendly. The dev-oriented package profile expands this further.</p>
+                <h3>Fonts</h3>
+                <p>Bytefall includes the fonts needed for its desktop and terminal identity, such as JetBrains Mono and related supporting fonts.</p>
+                <h3>Install profiles</h3>
+                <p>The current script-based package profiles are Default, Dev, and Server. They are defined through plain package-list files, which makes them easy to inspect, version, and reason about.</p>
+            `
+            },
+            'release-process': {
+                title: 'Release process',
+                subtitle: 'What a real Bytefall release requires.',
+                body: `
+                <p>A Bytefall release is not finished just because the ISO builds. A release is only real when the system works end to end.</p>
+                <h3>Release workflow</h3>
+                <ul>
+                    <li>validate the tree</li>
+                    <li>run a clean build</li>
+                    <li>test BIOS and UEFI boot</li>
+                    <li>test the live session</li>
+                    <li>test the installer</li>
+                    <li>test the installed system</li>
+                    <li>verify networking</li>
+                    <li>verify theming and branding</li>
+                    <li>generate checksums</li>
+                    <li>publish artifacts and notes</li>
+                </ul>
+                <p>Incremental builds are excellent for development, but release candidates should always come from a clean build so stale state does not leak into the published image.</p>
+            `
+            },
+            'release-checklist': {
+                title: 'Release checklist',
+                subtitle: 'The minimum areas a release must cover.',
+                body: `
+                <h3>Build</h3>
+                <ul><li>tree validation passes</li><li>clean build succeeds</li><li>ISO is produced</li><li>checksum file exists</li></ul>
+                <h3>Boot</h3>
+                <ul><li>BIOS boot works</li><li>UEFI boot works</li><li>live session reaches Plasma</li></ul>
+                <h3>Installer</h3>
+                <ul><li>welcome app opens</li><li>GPU selection works</li><li>installer launches</li><li>install completes</li><li>installed system boots</li></ul>
+                <h3>Visual</h3>
+                <ul><li>Plasma theme is correct</li><li>KWin decoration is correct</li><li>icon theme is correct</li><li>wallpapers are correct</li><li>boot branding is correct</li><li>shell branding is correct</li></ul>
+                <h3>Networking</h3>
+                <ul><li>live session networking works</li><li>installed system networking works</li></ul>
+                <h3>Publishing</h3>
+                <ul><li>ISO uploaded</li><li>checksum uploaded</li><li>release notes published</li><li>known issues published</li></ul>
+            `
+            },
+            publishing: {
+                title: 'Publishing',
+                subtitle: 'What a Bytefall release ships with.',
+                body: `
+                <p>A Bytefall release should be published with enough context for a real user to trust and understand it.</p>
+                <p>That means publishing the ISO, the checksum, release notes, known issues, architecture info, and the version name.</p>
+                <h3>Version naming</h3>
+                <p>Bytefall uses a numbered release line and a codename. The ISO filename uses the numeric release line and build date. Example: <code>Bytefall 0.1 Aurora</code>.</p>
+            `
+            },
+            'important-files': {
+                title: 'Important files',
+                subtitle: 'Key files in the Bytefall repository.',
+                body: `
+                <h3>Build scripts</h3>
+                <ul>
+                    <li><code>scripts/build-bytefall-iso.sh</code></li>
+                    <li><code>scripts/build-bytefall-iso-wsl.ps1</code></li>
+                    <li><code>scripts/validate-bytefall-tree.sh</code></li>
+                </ul>
+                <h3>Installer files</h3>
+                <ul>
+                    <li><code>calamares/settings.conf</code></li>
+                    <li><code>calamares/modules/</code></li>
+                    <li><code>archiso/bytefall/airootfs/usr/local/bin/bytefall-installer</code></li>
+                    <li><code>archiso/bytefall/airootfs/usr/local/bin/bytefall-calamares-root</code></li>
+                </ul>
+                <h3>Desktop defaults</h3>
+                <ul>
+                    <li><code>configs/skel/.config/kdeglobals</code></li>
+                    <li><code>configs/skel/.config/kwinrc</code></li>
+                    <li><code>configs/skel/.config/plasmarc</code></li>
+                </ul>
+                <h3>Theme and branding assets</h3>
+                <ul>
+                    <li><code>branding/plasma/</code></li>
+                    <li><code>branding/wallpapers/</code></li>
+                    <li><code>branding/ascii/</code></li>
+                    <li><code>branding/grub/</code></li>
+                    <li><code>branding/plymouth/</code></li>
+                </ul>
+                <h3>Welcome app</h3>
+                <ul><li><code>apps/bytefall-welcome/</code></li></ul>
+            `
+            },
+            'build-scripts-ref': {
+                title: 'Build scripts',
+                subtitle: 'What each script does.',
+                body: `
+                <p><strong style="color:var(--text-main);"><code>build-bytefall-iso.sh</code></strong> — the main ISO build script. Stages the profile, syncs overlays, manages incremental state, runs <code>mkarchiso</code>, and produces the ISO output.</p>
+                <p><strong style="color:var(--text-main);"><code>build-bytefall-iso-wsl.ps1</code></strong> — the Windows entry point for WSL-based builds.</p>
+                <p><strong style="color:var(--text-main);"><code>validate-bytefall-tree.sh</code></strong> — checks that required parts of the repo are present before a build.</p>
+                <p><strong style="color:var(--text-main);"><code>install-bytefall-base.sh</code></strong> — the lower-level base install path for manual installation and profile-driven system setup.</p>
+                <p>The repo also contains helper scripts for packaging, debugging, and repo generation.</p>
+            `
+            },
+            'boot-modes': {
+                title: 'Boot modes',
+                subtitle: 'Live ISO boot and installed system boot.',
+                body: `
+                <p>Bytefall's boot story has two parts.</p>
+                <h3>Live ISO boot</h3>
+                <ul><li>BIOS path</li><li>UEFI path</li></ul>
+                <h3>Installed system boot</h3>
+                <p>Depends on the install environment and selected install behavior. Firmware mode matters for users. For maintainers: ISO boot behavior and installed-system boot behavior are related, but not identical.</p>
+            `
+            },
+        };
+
+        function loadDoc(id) {
+            const doc = docPages[id];
+            if (!doc) return;
+
+            const content = document.getElementById('docs-content');
+            content.style.opacity = '0';
+            content.style.transform = 'translateY(8px)';
+            content.style.transition = 'opacity 0.22s ease, transform 0.22s ease';
+
+            setTimeout(() => {
+                content.innerHTML = `
+                <h1>${doc.title}</h1>
+                <div class="docs-subtitle">${doc.subtitle}</div>
+                <div class="docs-body">${doc.body}</div>
+            `;
+                content.style.opacity = '1';
+                content.style.transform = 'translateY(0)';
+            }, 180);
+
+            // update active nav item
+            document.querySelectorAll('.docs-nav-item').forEach(a => {
+                a.classList.remove('active');
+            });
+            // find the item that calls this doc
+            document.querySelectorAll('.docs-nav-item').forEach(a => {
+                if (a.getAttribute('onclick') === `loadDoc('${id}')`) {
+                    a.classList.add('active');
+                }
+            });
+        }
+
+        /* ══════════════════════════════════════════
+           DOWNLOAD
+        ══════════════════════════════════════════ */
+        function startDownload() {
+            const btn = document.getElementById('download-btn');
+            const progress = document.getElementById('download-progress');
+            const fill = document.getElementById('progress-fill');
+            const label = document.getElementById('progress-label');
+            const ISO_URL = 'https://mega.nz/file/vcMwQIRb#y6CM4Q8w__vrS_92wUE3lEdhfQblH-Z2mvlWrp_dito';
+
+            btn.style.opacity = '0.5';
+            btn.style.pointerEvents = 'none';
+            progress.classList.add('active');
+
+            let pct = 0;
+            const steps = [
+                { target: 15, msg: 'Getting ISO...', delay: 400 },
+                { target: 35, msg: 'Downloading bytefall-0.1-2026.05.14-x86_64.iso...', delay: 900 },
+                { target: 70, msg: 'Verifying bytefall-0.1-2026.05.14-x86_64.iso...', delay: 1600 },
+                { target: 90, msg: 'Verifying checksum...', delay: 2400 },
+                { target: 100, msg: 'Download started.', delay: 3000 },
+            ];
+
+            steps.forEach(step => {
+                setTimeout(() => {
+                    fill.style.width = step.target + '%';
+                    label.textContent = step.msg;
+
+                    if (step.target === 100) {
+                        // Trigger the actual download
+                        const a = document.createElement('a');
+                        a.href = ISO_URL;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+
+                        setTimeout(() => {
+                            btn.style.opacity = '1';
+                            btn.style.pointerEvents = 'auto';
+                            label.textContent = '✓ Download started';
+                        }, 500);
+                    }
+                }, step.delay);
+            });
+        }
+
+        /* ══════════════════════════════════════════
+           BACKGROUND GRID CANVAS
+        ══════════════════════════════════════════ */
+        (function () {
+            const canvas = document.getElementById('grid-canvas');
+            const ctx = canvas.getContext('2d');
+            const CELL = 48;
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = document.documentElement.scrollHeight;
+                draw();
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+                for (let y = 0; y < canvas.height; y += CELL) {
+                    ctx.moveTo(0, y); ctx.lineTo(canvas.width, y);
+                }
+                for (let x = 0; x < canvas.width; x += CELL) {
+                    ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height);
+                }
+                ctx.strokeStyle = 'rgba(255,255,255,0.028)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(0,229,255,0.07)';
+                for (let y = 0; y < canvas.height; y += CELL) {
+                    for (let x = 0; x < canvas.width; x += CELL) {
+                        if ((x / CELL + y / CELL) % 4 === 0) {
+                            ctx.beginPath();
+                            ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                }
+            }
+
+            window.addEventListener('resize', resize);
+            window.addEventListener('load', resize);
+            resize();
+        })();
+
+        /* ══════════════════════════════════════════
+           3D TILT ON IMAGE CARDS
+        ══════════════════════════════════════════ */
+        document.querySelectorAll('.img-placeholder').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const r = card.getBoundingClientRect();
+                const ry = ((e.clientX - r.left - r.width / 2) / (r.width / 2)) * 12;
+                const rx = ((r.height / 2 - (e.clientY - r.top)) / (r.height / 2)) * 12;
+                card.style.transform = `perspective(1200px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px) scale(1)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1200px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1)`;
+            });
+        });
+
+        /* ══════════════════════════════════════════
+           SCROLL REVEAL + SECTION LINE DRAW
+        ══════════════════════════════════════════ */
+        const revealObserver = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (!e.isIntersecting) return;
+                e.target.classList.add('visible');
+                if (e.target.tagName === 'SECTION') e.target.classList.add('line-drawn');
+                revealObserver.unobserve(e.target);
+            });
+        }, { threshold: 0.07 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+        document.querySelectorAll('section').forEach(el => revealObserver.observe(el));
+    </script>
+</body>
+
+</html>
