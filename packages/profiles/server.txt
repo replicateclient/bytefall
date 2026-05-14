@@ -1,0 +1,26 @@
+# Server Bytefall: no Plasma session, just a tuned Arch base for services.
+base
+linux-zen
+linux-firmware
+intel-ucode
+amd-ucode
+systemd
+networkmanager
+sudo
+grub
+limine
+efibootmgr
+dosfstools
+cryptsetup
+lvm2
+btrfs-progs
+xfsprogs
+e2fsprogs
+openssh
+curl
+wget
+rsync
+jq
+tmux
+htop
+terminus-font

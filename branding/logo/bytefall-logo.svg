@@ -1,0 +1,23 @@
+<svg width="512" height="512" viewBox="0 0 500 500" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>Bytefall</title>
+  <defs>
+    <linearGradient id="ice" x1="55" y1="40" x2="430" y2="455" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f4fcff"/>
+      <stop offset="0.30" stop-color="#a6efff"/>
+      <stop offset="0.68" stop-color="#54c9ef"/>
+      <stop offset="1" stop-color="#26739d"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="80" y1="60" x2="420" y2="440" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.70"/>
+      <stop offset="1" stop-color="#a6efff" stop-opacity="0.10"/>
+    </linearGradient>
+  </defs>
+  <polygon points="250,42 430,146 430,354 250,458 70,354 70,146" fill="url(#ice)"/>
+  <polygon points="250,42 430,146 250,250 70,146" fill="#e8fbff" opacity="0.22"/>
+  <polygon points="430,146 430,354 250,250" fill="#0f7fb8" opacity="0.25"/>
+  <polygon points="250,250 430,354 250,458" fill="#55d4f6" opacity="0.20"/>
+  <polygon points="70,354 250,250 250,458" fill="#123d68" opacity="0.20"/>
+  <polygon points="70,146 250,250 70,354" fill="#c9f6ff" opacity="0.18"/>
+  <polygon points="250,42 250,250 430,146" fill="#ffffff" opacity="0.13"/>
+  <polyline points="250,42 430,146 430,354 250,458 70,354 70,146 250,42" fill="none" stroke="url(#edge)" stroke-width="4" stroke-linejoin="round"/>
+</svg>

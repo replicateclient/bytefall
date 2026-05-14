@@ -1,0 +1,191 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+selection_file="${HOME:-/home/bytefall}/.config/bytefall/gpu-selection.conf"
+
+firmware_type() {
+  if [[ -d /sys/firmware/efi ]]; then
+    printf 'efi\n'
+  else
+    printf 'bios\n'
+  fi
+}
+
+detect_gpu_brand() {
+  local lspci_output
+  lspci_output="$(lspci -nn 2>/dev/null || true)"
+
+  if printf '%s\n' "$lspci_output" | grep -Eqi 'VGA compatible controller|3D controller|Display controller' &&
+     printf '%s\n' "$lspci_output" | grep -Eqi 'NVIDIA'; then
+    printf 'nvidia\n'
+    return 0
+  fi
+
+  if printf '%s\n' "$lspci_output" | grep -Eqi 'VGA compatible controller|3D controller|Display controller' &&
+     printf '%s\n' "$lspci_output" | grep -Eqi 'Advanced Micro Devices|ATI Technologies|AMD/ATI'; then
+    printf 'amd\n'
+    return 0
+  fi
+
+  printf 'none\n'
+}
+
+load_gpu_selection() {
+  local selected=""
+  if [[ -r "$selection_file" ]]; then
+    selected="$(tr '[:upper:]' '[:lower:]' < "$selection_file" | head -n 1 | tr -d '[:space:]')"
+  fi
+
+  case "$selected" in
+    amd|nvidia|none)
+      printf '%s\n' "$selected"
+      ;;
+    auto|"")
+      detect_gpu_brand
+      ;;
+    *)
+      detect_gpu_brand
+      ;;
+  esac
+}
+
+prompt_bootloader_selection() {
+  local fw_type selected
+  fw_type="$(firmware_type)"
+  selected="grub"
+
+  if command -v kdialog >/dev/null 2>&1 && [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
+    if [[ "$fw_type" == "efi" ]]; then
+      selected="$(
+        kdialog --title "Install Bytefall" \
+          --radiolist "Choose a bootloader for this installation." \
+          grub "GRUB - safest default, works well across mixed setups." on \
+          systemd-boot "systemd-boot - clean and simple for UEFI installs." off
+      )" || return 1
+    else
+      kdialog --title "Install Bytefall" \
+        --msgbox "This live session was booted in BIOS mode, so Bytefall will install with GRUB.\n\nsystemd-boot only works on UEFI installs." || return 1
+    fi
+  fi
+
+  if [[ "$selected" != "systemd-boot" ]]; then
+    selected="grub"
+  fi
+
+  printf '%s\n' "$selected"
+}
+
+show_failure() {
+  local log_file="$1"
+  if command -v konsole >/dev/null 2>&1; then
+    exec konsole --noclose -e bash -lc 'cat /tmp/bytefall-calamares.log; echo; echo "Calamares failed to stay open."; echo "Press Enter to close."; read -r _'
+  fi
+  cat "$log_file" >&2
+  return 1
+}
+
+capture_debug_trace() {
+  local log_file="$1"
+
+  if ! command -v gdb >/dev/null 2>&1; then
+    return 0
+  fi
+
+  {
+    echo
+    echo "===== gdb backtrace retry ====="
+  } >>"$log_file"
+
+  /usr/bin/sudo -n --preserve-env="$(IFS=,; echo "${preserve_env[*]}")" \
+    /usr/bin/gdb -q -batch \
+    -ex 'set pagination off' \
+    -ex 'set confirm off' \
+    -ex run \
+    -ex 'thread apply all bt full' \
+    --args /usr/local/bin/bytefall-calamares-root -d >>"$log_file" 2>&1 || true
+}
+
+launch_calamares() {
+  local log_file="/tmp/bytefall-calamares.log"
+  local session_log="/root/.cache/calamares/session.log"
+  local had_xhost=0
+  local -a preserve_env=(
+    "DISPLAY"
+    "XAUTHORITY"
+    "XDG_RUNTIME_DIR"
+    "DBUS_SESSION_BUS_ADDRESS"
+    "KDE_SESSION_VERSION"
+    "KDE_FULL_SESSION"
+    "QT_QPA_PLATFORMTHEME"
+    "XDG_CURRENT_DESKTOP"
+    "WAYLAND_DISPLAY"
+    "XDG_SESSION_TYPE"
+    "QT_QPA_PLATFORM"
+    "QT_XCB_FORCE_SOFTWARE_OPENGL"
+    "QT_QUICK_BACKEND"
+    "LIBGL_ALWAYS_SOFTWARE"
+    "MESA_LOADER_DRIVER_OVERRIDE"
+    "BYTEFALL_SELECTED_GPU"
+    "BYTEFALL_SELECTED_BOOTLOADER"
+  )
+  local status=0
+
+  : >"$log_file"
+  export QT_XCB_FORCE_SOFTWARE_OPENGL=1
+  export QT_QUICK_BACKEND=software
+  export LIBGL_ALWAYS_SOFTWARE=1
+  export MESA_LOADER_DRIVER_OVERRIDE=llvmpipe
+
+  if [[ -n "${DISPLAY:-}" ]] && command -v xhost >/dev/null 2>&1; then
+    if xhost +SI:localuser:root >/dev/null 2>&1; then
+      had_xhost=1
+    fi
+  fi
+
+  if command -v sudo >/dev/null 2>&1 && /usr/bin/sudo -n true >/dev/null 2>&1; then
+    /usr/bin/sudo -n rm -f "$session_log" >/dev/null 2>&1 || true
+    /usr/bin/sudo -n --preserve-env="$(IFS=,; echo "${preserve_env[*]}")" /usr/local/bin/bytefall-calamares-root -d >>"$log_file" 2>&1 &
+    local calamares_pid=$!
+
+    sleep 5
+    if kill -0 "$calamares_pid" 2>/dev/null; then
+      wait "$calamares_pid"
+      status=$?
+      (( had_xhost )) && xhost -SI:localuser:root >/dev/null 2>&1 || true
+      return "$status"
+    fi
+
+    wait "$calamares_pid" || status=$?
+    printf 'Calamares exited early with status %s\n' "$status" >>"$log_file"
+    if /usr/bin/sudo -n test -f "$session_log" >/dev/null 2>&1; then
+      {
+        echo "===== Calamares session.log ====="
+        /usr/bin/sudo -n tail -n 200 "$session_log"
+      } >>"$log_file" 2>&1 || true
+    fi
+    if command -v coredumpctl >/dev/null 2>&1; then
+      {
+        echo
+        echo "===== Recent coredumpctl entries for calamares ====="
+        /usr/bin/sudo -n coredumpctl --no-pager --no-legend list calamares 2>/dev/null | tail -n 5
+      } >>"$log_file" 2>&1 || true
+    fi
+    capture_debug_trace "$log_file"
+  fi
+
+  (( had_xhost )) && xhost -SI:localuser:root >/dev/null 2>&1 || true
+  show_failure "$log_file"
+}
+
+if command -v calamares >/dev/null 2>&1; then
+  export BYTEFALL_SELECTED_GPU="$(load_gpu_selection)"
+  export BYTEFALL_SELECTED_BOOTLOADER="$(prompt_bootloader_selection)" || exit 0
+  launch_calamares
+  exit $?
+fi
+
+if command -v archinstall >/dev/null 2>&1 && command -v konsole >/dev/null 2>&1; then
+  exec konsole --noclose --workdir /root -e bash -lc 'if sudo -n true >/dev/null 2>&1; then sudo -n archinstall; else sudo archinstall; fi; status=$?; echo; echo "archinstall exited with status $status"; echo "Press Enter to close."; read -r _'
+fi
+
+exec bytefall-welcome --installer-status

@@ -1,0 +1,25 @@
+title-text: "Bytefall"
+title-font: "Unifont Regular 32"
+title-color: "#67E8F9"
+desktop-color: "#090A0F"
+desktop-image: "background.png"
+desktop-image-scale-method: "crop"
+desktop-image-h-align: "center"
+desktop-image-v-align: "center"
+terminal-font: "Unifont Regular 16"
+terminal-left: "10%"
+terminal-top: "20%"
+terminal-width: "80%"
+terminal-height: "65%"
++ boot_menu {
+  left = 10%
+  top = 32%
+  width = 80%
+  height = 45%
+  item_font = "Unifont Regular 18"
+  item_color = "#E6EDF7"
+  selected_item_color = "#67E8F9"
+  item_height = 32
+  item_padding = 8
+  item_spacing = 4
+}

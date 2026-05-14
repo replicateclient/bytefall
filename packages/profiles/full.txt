@@ -1,0 +1,21 @@
+# Full Bytefall Workstation: Developer plus container workflow and extra desktop hardware support.
+docker
+docker-compose
+powerdevil
+bluedevil
+kde-system-meta
+kcalc
+parted
+gparted
+podman
+qemu-desktop
+virt-manager
+linux-zen-headers
+base-devel
+jdk-openjdk
+qtcreator
+code
+neovim
+tmux
+wireshark-qt
+firefox

@@ -1,0 +1,18 @@
+{
+    "KPlugin": {
+        "Authors": [
+            {
+                "Name": "FreshDoctor"
+            }
+        ],
+        "Category": "",
+        "Dependencies": [
+        ],
+        "Description": "",
+        "EnabledByDefault": true,
+        "Id": "FairyWren.Dark.Aurorae",
+        "License": "GPLv3",
+        "Name": "FairyWren Dark",
+        "Version": "2606"
+    }
+}

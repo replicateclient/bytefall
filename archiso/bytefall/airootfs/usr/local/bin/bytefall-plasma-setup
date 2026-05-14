@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -u
+
+marker="${HOME}/.config/bytefall/plasma-setup.done"
+
+pick_default_wallpaper() {
+  local -a candidates=(
+    "/usr/share/wallpapers/BytefallAurora/contents/images/3840x2160.png"
+    "/usr/share/wallpapers/BytefallAurora/contents/images/3344x1882.png"
+  )
+  local -a existing=()
+  local entry
+  local choice_index=0
+
+  for entry in "${candidates[@]}"; do
+    [[ -f "$entry" ]] && existing+=("$entry")
+  done
+
+  if (( ${#existing[@]} == 0 )); then
+    return 1
+  fi
+
+  if command -v shuf >/dev/null 2>&1; then
+    printf '%s\n' "${existing[@]}" | shuf -n 1
+    return 0
+  fi
+
+  if [[ -r /dev/urandom ]]; then
+    choice_index="$(
+      od -An -N2 -tu2 /dev/urandom 2>/dev/null | tr -d ' '
+    )"
+    choice_index=$(( choice_index % ${#existing[@]} ))
+  fi
+
+  printf '%s\n' "${existing[$choice_index]}"
+}
+
+if [[ "${1:-}" == "--daemon" ]]; then
+  if [[ -e "$marker" ]]; then
+    exit 0
+  fi
+fi
+
+for _ in $(seq 1 45); do
+  if qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "print('ready')" >/dev/null 2>&1; then
+    break
+  fi
+  sleep 1
+done
+
+wallpaper="$(pick_default_wallpaper || true)"
+if [[ -n "${wallpaper:-}" ]] && command -v plasma-apply-wallpaperimage >/dev/null 2>&1; then
+  plasma-apply-wallpaperimage "$wallpaper" >/dev/null 2>&1 || true
+fi
+
+qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
+if (panels().length === 0) {
+  var panel = new Panel();
+  panel.location = 'bottom';
+  panel.height = 2 * Math.ceil(gridUnit * 2.5 / 2);
+  panel.addWidget('org.kde.plasma.kickoff');
+  panel.addWidget('org.kde.plasma.icontasks');
+  panel.addWidget('org.kde.plasma.marginsseparator');
+  panel.addWidget('org.kde.plasma.systemtray');
+  panel.addWidget('org.kde.plasma.digitalclock');
+  panel.addWidget('org.kde.plasma.showdesktop');
+}
+
+for (const panel of panels()) {
+  panel.location = 'bottom';
+  panel.alignment = 'center';
+  panel.lengthMode = 'fit';
+  panel.floating = true;
+  panel.height = Math.max(panel.height, 2 * Math.ceil(gridUnit * 2.5 / 2));
+  panel.opacity = 2;
+
+  var shellConfig = ConfigFile('plasmashellrc', 'PlasmaViews');
+  var panelConfig = ConfigFile(shellConfig, 'Panel ' + panel.id);
+  panelConfig.writeEntry('floating', 1);
+  panelConfig.writeEntry('panelLengthMode', 1);
+  panelConfig.writeEntry('panelOpacity', 2);
+
+  for (const widget of panel.widgets()) {
+    if (widget.type === 'org.kde.plasma.kickoff' || widget.type === 'org.kde.plasma.kicker' || widget.type === 'org.kde.plasma.kickerdash') {
+      widget.currentConfigGroup = ['General'];
+      widget.writeConfig('icon', 'bytefall');
+    }
+  }
+}
+" >/dev/null 2>&1 || true
+
+mkdir -p "$(dirname "$marker")"
+date -u +%FT%TZ > "$marker"

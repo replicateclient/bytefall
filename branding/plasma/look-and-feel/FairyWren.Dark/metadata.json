@@ -1,0 +1,20 @@
+{
+    "KPackageStructure": "Plasma/LookAndFeel",
+    "KPlugin": {
+        "Authors": [{
+            "Email": "zygvh2s76q@privaterelay.appleid.com",
+            "Name": "FreshDoctor"
+        }],
+        "Id": "FairyWren.Dark",
+        "Name": "FairyWren Dark",
+        "Category": "Global Themes (Plasma 6)",
+        "Description": "",
+        "ServiceTypes": ["Plasma/LookAndFeel"],
+        "License": "GPL 3+",
+        "Website": "https://gitlab.com/FreshDoctor",
+        "Keywords": "Desktop;Workspace;Appearance;Look and Feel;",
+        "X-Plasma-APIVersion": "2",
+        "X-Plasma-MainScript": "default",
+        "EnabledByDefault": true
+    }
+}

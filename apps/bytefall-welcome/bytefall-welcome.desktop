@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Bytefall Welcome
+Comment=Start here in the Bytefall live session
+Exec=bytefall-welcome
+Icon=bytefall
+Terminal=false
+Categories=System;

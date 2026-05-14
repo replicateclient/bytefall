@@ -1,0 +1,11 @@
+NAME="Bytefall"
+PRETTY_NAME="Bytefall 0.1 Aurora"
+ID=bytefall
+ID_LIKE=arch
+BUILD_ID=rolling
+ANSI_COLOR="1;36"
+HOME_URL="https://bytefall.dev"
+DOCUMENTATION_URL="https://bytefall.dev/docs"
+SUPPORT_URL="https://bytefall.dev/support"
+BUG_REPORT_URL="https://bytefall.dev/issues"
+LOGO=bytefall

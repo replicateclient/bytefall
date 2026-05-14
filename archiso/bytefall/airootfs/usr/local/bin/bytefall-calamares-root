@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+set_bootloader_config() {
+  local selected="${1:-grub}"
+  local config="/etc/calamares/modules/bootloader.conf"
+
+  [[ -f "$config" ]] || return 0
+  /usr/bin/sed -i -E "s/^efiBootLoader: .*/efiBootLoader: \"$selected\"/" "$config"
+}
+
+write_packages_config() {
+  local selected_gpu="${1:-none}"
+  local config="/etc/calamares/modules/packages.conf"
+  local install_block=""
+
+  case "$selected_gpu" in
+    amd)
+      install_block=$'  - try_install:\n      - mesa\n      - vulkan-radeon\n'
+      ;;
+    nvidia)
+      install_block=$'  - try_install:\n      - nvidia-dkms\n      - nvidia-utils\n      - nvidia-settings\n      - egl-wayland\n'
+      ;;
+    none|*)
+      install_block=""
+      ;;
+  esac
+
+  cat >"$config" <<EOF
+---
+backend: pacman
+skip_if_no_internet: false
+update_db: true
+update_system: false
+operations:
+${install_block}  - try_remove:
+      - calamares
+      - gparted
+EOF
+}
+
+if [[ -n "${DISPLAY:-}" ]]; then
+  export QT_QPA_PLATFORM="xcb"
+  unset WAYLAND_DISPLAY
+fi
+
+export QT_XCB_FORCE_SOFTWARE_OPENGL="${QT_XCB_FORCE_SOFTWARE_OPENGL:-1}"
+export QT_QUICK_BACKEND="${QT_QUICK_BACKEND:-software}"
+export LIBGL_ALWAYS_SOFTWARE="${LIBGL_ALWAYS_SOFTWARE:-1}"
+export MESA_LOADER_DRIVER_OVERRIDE="${MESA_LOADER_DRIVER_OVERRIDE:-llvmpipe}"
+
+set_bootloader_config "${BYTEFALL_SELECTED_BOOTLOADER:-grub}"
+write_packages_config "${BYTEFALL_SELECTED_GPU:-none}"
+
+exec /usr/bin/calamares "$@"

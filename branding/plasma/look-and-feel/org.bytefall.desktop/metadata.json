@@ -1,0 +1,19 @@
+{
+  "KPlugin": {
+    "Authors": [
+      {
+        "Email": "hello@bytefall.dev",
+        "Name": "Bytefall Project"
+      }
+    ],
+    "Category": "Plasma Look And Feel",
+    "Description": "Bytefall splash theme",
+    "Id": "org.bytefall.desktop",
+    "License": "CC-BY-SA-4.0",
+    "Name": "Bytefall",
+    "Version": "0.1",
+    "Website": "https://bytefall.dev"
+  },
+  "Keywords": "bytefall,splash,dark,ice",
+  "X-Plasma-APIVersion": "2"
+}

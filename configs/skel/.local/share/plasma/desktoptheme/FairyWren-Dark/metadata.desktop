@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=FairyWren-Dark
+X-KDE-PluginInfo-Author=FreshDoctor
+X-KDE-PluginInfo-EnabledByDefault=true
+X-KDE-PluginInfo-License=GPL3.0
+X-KDE-PluginInfo-Name=FairyWren-Dark
+X-KDE-PluginInfo-Version=2602
+
+[BlurBehindEffect]
+enabled=true
+

@@ -1,0 +1,19 @@
+[kwin]
+Window Close=Alt+F4,Alt+F4,Close Window
+Window Maximize=Meta+Up,Meta+PgUp,Maximize Window
+Window Minimize=Meta+Down,Meta+PgDown,Minimize Window
+Window Quick Tile Left=Meta+Left,Meta+Left,Quick Tile Window to the Left
+Window Quick Tile Right=Meta+Right,Meta+Right,Quick Tile Window to the Right
+
+[services][org.kde.konsole.desktop]
+_launch=Meta+Return,Meta+Return,Konsole
+
+[services][org.kde.dolphin.desktop]
+_launch=Meta+E,Meta+E,Dolphin
+
+[services][org.kde.spectacle.desktop]
+RectangularRegionScreenShot=Meta+Shift+S,Meta+Shift+S,Capture Rectangular Region
+
+[krunner]
+_launch=Alt+Space,Alt+Space,KRunner
+

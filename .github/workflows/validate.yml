@@ -1,0 +1,20 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tree:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Bytefall tree
+        run: bash scripts/validate-bytefall-tree.sh
+      - name: Check shell syntax
+        run: |
+          bash -n scripts/build-bytefall-iso.sh
+          bash -n scripts/install-build-deps.sh
+          bash -n scripts/install-bytefall-base.sh
+          bash -n scripts/make-pacman-repo.sh
+          bash -n scripts/build-calamares-aur-package.sh

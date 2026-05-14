@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Bytefall Plasma Setup
+Exec=/usr/local/bin/bytefall-plasma-setup --daemon
+Icon=bytefall
+Terminal=false
+OnlyShowIn=KDE;
+X-KDE-autostart-after=panel

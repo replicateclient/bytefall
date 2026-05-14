@@ -1,0 +1,28 @@
+format = """
+[Bytefall](bold fg:cyan) $directory$git_branch$git_status$nodejs$python$rust$cmd_duration
+$character"""
+
+add_newline = false
+
+[character]
+success_symbol = "[>](bold fg:cyan)"
+error_symbol = "[>](bold fg:purple)"
+
+[directory]
+style = "bold fg:purple"
+truncation_length = 3
+truncate_to_repo = false
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+style = "fg:cyan"
+symbol = "git:"
+
+[git_status]
+format = "[$all_status$ahead_behind]($style) "
+style = "fg:yellow"
+
+[cmd_duration]
+format = "[$duration]($style) "
+style = "fg:bright-black"
+min_time = 1000

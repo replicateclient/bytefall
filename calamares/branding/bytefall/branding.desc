@@ -1,0 +1,32 @@
+---
+componentName: bytefall
+welcomeStyleCalamares: false
+welcomeExpandingLogo: true
+windowExpanding: normal
+windowSize: 800px,520px
+windowPlacement: center
+sidebar: widget
+navigation: widget
+strings:
+  productName: "Bytefall"
+  shortProductName: "Bytefall"
+  version: "0.1"
+  shortVersion: "0.1"
+  versionedName: "Bytefall 0.1 Aurora"
+  shortVersionedName: "Bytefall 0.1 Aurora"
+  bootloaderEntryName: "Bytefall"
+  productUrl: "https://bytefall.dev"
+  supportUrl: "https://bytefall.dev/support"
+  knownIssuesUrl: "https://bytefall.dev/issues"
+  releaseNotesUrl: "https://bytefall.dev/releases"
+images:
+  productIcon: "bytefall.svg"
+  productLogo: "bytefall.svg"
+  productWelcome: "bytefall.svg"
+slideshow: "show.qml"
+slideshowAPI: 2
+style:
+  SidebarBackground: "#071218"
+  SidebarText: "#d9eef3"
+  SidebarBackgroundCurrent: "#11232b"
+  SidebarTextCurrent: "#8eeaff"

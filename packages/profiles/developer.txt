@@ -1,0 +1,19 @@
+# Developer Bytefall: Minimal plus compilers, language toolchains, debuggers, and build systems.
+gcc
+clang
+make
+cmake
+ninja
+pkgconf
+gdb
+strace
+lldb
+python
+python-pip
+nodejs
+npm
+rustup
+go
+htop
+yq
+

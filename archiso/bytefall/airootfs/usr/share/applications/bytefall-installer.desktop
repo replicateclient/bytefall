@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Install Bytefall
+Comment=Install Bytefall to disk
+Exec=/usr/bin/bytefall-install-launcher
+TryExec=/usr/bin/bytefall-install-launcher
+Icon=bytefall
+Terminal=false
+Categories=System;

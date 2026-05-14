@@ -1,0 +1,87 @@
+QWidget {
+    background-color: #071218;
+    color: #d9eef3;
+    font-family: "Noto Sans", "JetBrains Mono", sans-serif;
+}
+
+#mainApp {
+    background-color: #050b0f;
+}
+
+#sidebarApp {
+    background-color: #071218;
+    color: #d9eef3;
+}
+
+#logoApp {
+    background-color: transparent;
+}
+
+QPushButton {
+    background-color: #10232b;
+    color: #e9f9ff;
+    border: 1px solid #18343d;
+    border-radius: 8px;
+    padding: 7px 14px;
+}
+
+QPushButton:hover,
+QPushButton:focus {
+    background-color: #12303b;
+    border-color: #55d4f6;
+}
+
+QPushButton:disabled {
+    background-color: #0b151a;
+    color: #6d8791;
+    border-color: #16262d;
+}
+
+QLineEdit,
+QTextEdit,
+QPlainTextEdit,
+QComboBox,
+QAbstractSpinBox,
+QTextBrowser {
+    background-color: #0c1a20;
+    color: #d9eef3;
+    border: 1px solid #18343d;
+    border-radius: 8px;
+}
+
+QScrollArea,
+QGroupBox,
+QFrame,
+QListView,
+QTreeView,
+QTableView {
+    background-color: transparent;
+    color: #d9eef3;
+    border: 0;
+}
+
+QHeaderView::section {
+    background-color: #0f2027;
+    color: #d9eef3;
+    border: 0;
+    padding: 6px;
+}
+
+QComboBox QAbstractItemView,
+QListView::item,
+QTreeView::item {
+    background-color: #0c1a20;
+    color: #d9eef3;
+}
+
+QListView::item:selected,
+QTreeView::item:selected {
+    background-color: #12303b;
+    color: #8eeaff;
+}
+
+QCheckBox,
+QRadioButton,
+QLabel {
+    color: #d9eef3;
+}

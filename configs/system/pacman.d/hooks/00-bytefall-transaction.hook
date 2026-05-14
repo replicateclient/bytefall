@@ -1,0 +1,12 @@
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Type = Package
+Target = *
+
+[Action]
+Description = Bytefall is applying package changes...
+When = PreTransaction
+Exec = /usr/bin/true
+

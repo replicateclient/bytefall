@@ -1,0 +1,13 @@
+[Unit]
+Description=Prepare Bytefall live session
+After=systemd-user-sessions.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/install -d -o bytefall -g bytefall /home/bytefall/Desktop
+ExecStart=/usr/bin/cp /usr/share/applications/bytefall-installer.desktop /home/bytefall/Desktop/bytefall-installer.desktop
+ExecStart=/usr/bin/chown bytefall:bytefall /home/bytefall/Desktop/bytefall-installer.desktop
+ExecStart=/usr/bin/chmod 755 /home/bytefall/Desktop/bytefall-installer.desktop
+
+[Install]
+WantedBy=multi-user.target

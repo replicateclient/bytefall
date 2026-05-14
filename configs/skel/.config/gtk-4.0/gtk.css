@@ -1,0 +1,19 @@
+* {
+  border-radius: 0;
+}
+
+window,
+dialog,
+popover,
+menu {
+  background-color: #090A0F;
+  color: #E6EDF7;
+}
+
+button,
+entry,
+combobox,
+notebook tab {
+  border-radius: 0;
+}
+

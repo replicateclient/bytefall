@@ -1,0 +1,11 @@
+polkit.addRule(function(action, subject) {
+    var program = action.lookup("program");
+    if (subject.user == "bytefall" &&
+        subject.active &&
+        action.id == "org.freedesktop.policykit.exec" &&
+        (program == "/usr/bin/calamares" ||
+         program == "/usr/sbin/calamares" ||
+         program == "/usr/local/bin/bytefall-calamares-root")) {
+        return polkit.Result.YES;
+    }
+});
