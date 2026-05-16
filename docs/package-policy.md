@@ -55,6 +55,7 @@ Rule: if a default package cannot be justified in one sentence, it is not includ
 | plasma-meta | Provides the KDE Plasma desktop shell. |
 | kde-system-meta | Provides core KDE system tools expected in a Plasma workstation. |
 | sddm | Provides a graphical login manager integrated with KDE. |
+| breeze | Provides the default Plasma and SDDM theme assets needed by the live login path. |
 | konsole | Provides a KDE-native terminal for development workflows. |
 | dolphin | Provides a KDE-native file manager. |
 | ark | Provides archive management in the desktop. |
@@ -68,26 +69,13 @@ Rule: if a default package cannot be justified in one sentence, it is not includ
 | papirus-icon-theme | Provides a complete icon set that Bytefall can inherit while custom icons mature. |
 | qt6-base | Provides the Qt runtime and build libraries for Bytefall's native custom apps. |
 | qt6-declarative | Provides Qt Quick/QML runtime support for Bytefall's Kirigami-style welcome app. |
+| qt6-svg | Provides SVG image decoding for Qt Quick logo rendering and themed assets. |
 | kirigami | Provides KDE-native Qt Quick components for Bytefall's welcome app. |
 | qqc2-desktop-style | Makes Qt Quick Controls follow the Plasma desktop style instead of generic fallback widgets. |
 | xdg-desktop-portal-kde | Enables modern sandbox and file portal behavior in KDE. |
 | powerdevil | Provides KDE power management for laptops and workstations. |
 | plasma-nm | Provides NetworkManager integration in Plasma. |
 | bluedevil | Provides Bluetooth controls in Plasma. |
-
-## Lightweight Server Desktop
-
-| Package | Reason |
-| --- | --- |
-| lxqt-session | Provides the lightweight graphical session used by the Server profile. |
-| lxqt-panel | Provides a low-memory desktop panel for the Server profile. |
-| lxqt-runner | Provides quick app launching without the full Plasma shell. |
-| lxqt-config | Provides basic LXQt settings tools. |
-| lxqt-qtplugin | Keeps Qt apps integrated in the LXQt session. |
-| lxqt-policykit | Provides graphical privilege prompts in the LXQt session. |
-| pcmanfm-qt | Provides a lightweight Qt file manager and desktop handler. |
-| qterminal | Provides a lightweight Qt terminal for the Server profile. |
-| openbox | Provides the window manager used by the LXQt Server session. |
 
 ## Developer Stack
 

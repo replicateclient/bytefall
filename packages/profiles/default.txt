@@ -20,6 +20,7 @@ plymouth
 plasma-meta
 sddm
 aurorae
+breeze
 konsole
 kitty
 dolphin
@@ -32,6 +33,7 @@ kvantum-qt5
 breeze-gtk
 xdg-desktop-portal-kde
 plasma-nm
+qt6-svg
 curl
 wget
 openssh

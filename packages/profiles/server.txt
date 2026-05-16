@@ -1,4 +1,4 @@
-# Server Bytefall: lightweight LXQt desktop with a tuned Arch base for services.
+# Server Bytefall: trimmed Plasma desktop with a tuned Arch base for services.
 base
 linux-zen
 linux-firmware
@@ -9,15 +9,12 @@ networkmanager
 sudo
 fish
 sddm
-lxqt-session
-lxqt-panel
-lxqt-runner
-lxqt-config
-lxqt-qtplugin
-lxqt-policykit
-pcmanfm-qt
-qterminal
-openbox
+plasma-meta
+plasma-nm
+xdg-desktop-portal-kde
+konsole
+breeze
+qt6-svg
 papirus-icon-theme
 grub
 limine

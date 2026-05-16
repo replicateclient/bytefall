@@ -170,7 +170,7 @@ mkdir -p /etc/sddm.conf.d
 cat >/etc/sddm.conf.d/10-bytefall.conf <<'EOF'
 [Autologin]
 User=bytefall
-Session=plasma
+Session=plasma.desktop
 
 [Theme]
 Current=breeze

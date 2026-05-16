@@ -48,6 +48,7 @@ plasma-meta
 kde-system-meta
 sddm
 aurorae
+breeze
 kdialog
 konsole
 kitty
@@ -63,23 +64,13 @@ materia-gtk-theme
 papirus-icon-theme
 qt6-base
 qt6-declarative
+qt6-svg
 kirigami
 qqc2-desktop-style
 xdg-desktop-portal-kde
 powerdevil
 plasma-nm
 bluedevil
-
-# Lightweight desktop for Server profile
-lxqt-session
-lxqt-panel
-lxqt-runner
-lxqt-config
-lxqt-qtplugin
-lxqt-policykit
-pcmanfm-qt
-qterminal
-openbox
 
 # Developer stack
 git
