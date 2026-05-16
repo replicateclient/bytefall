@@ -247,7 +247,7 @@ EOF
     timeout: 10
   - command: "rm -f /etc/skel/.config/autostart/bytefall-plasma-setup.desktop /etc/skel/.config/ksplashrc /etc/skel/.config/plasmarc /etc/skel/.config/kdeglobals /etc/skel/.config/kwinrc"
     timeout: 10
-  - command: "for home in /home/*; do [ -d \"$home\" ] || continue; rm -f \"$home/.config/autostart/bytefall-plasma-setup.desktop\" \"$home/.config/ksplashrc\" \"$home/.config/plasmarc\" \"$home/.config/kdeglobals\" \"$home/.config/kwinrc\"; done"
+  - command: "find /home -mindepth 1 -maxdepth 1 -type d -exec rm -f {}/.config/autostart/bytefall-plasma-setup.desktop {}/.config/ksplashrc {}/.config/plasmarc {}/.config/kdeglobals {}/.config/kwinrc \\;"
     timeout: 10
   - command: "rm -rf /etc/skel/.local/share/plasma /etc/skel/.config/Kvantum /usr/share/wallpapers/BytefallAurora /usr/share/wallpapers/BytefallClassic /usr/share/plasma/look-and-feel/org.bytefall.desktop /usr/share/plasma/look-and-feel/FairyWren* /usr/share/aurorae/themes/FairyWren*"
     timeout: 10
