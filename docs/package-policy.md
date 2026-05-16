@@ -75,6 +75,20 @@ Rule: if a default package cannot be justified in one sentence, it is not includ
 | plasma-nm | Provides NetworkManager integration in Plasma. |
 | bluedevil | Provides Bluetooth controls in Plasma. |
 
+## Lightweight Server Desktop
+
+| Package | Reason |
+| --- | --- |
+| lxqt-session | Provides the lightweight graphical session used by the Server profile. |
+| lxqt-panel | Provides a low-memory desktop panel for the Server profile. |
+| lxqt-runner | Provides quick app launching without the full Plasma shell. |
+| lxqt-config | Provides basic LXQt settings tools. |
+| lxqt-qtplugin | Keeps Qt apps integrated in the LXQt session. |
+| lxqt-policykit | Provides graphical privilege prompts in the LXQt session. |
+| pcmanfm-qt | Provides a lightweight Qt file manager and desktop handler. |
+| qterminal | Provides a lightweight Qt terminal for the Server profile. |
+| openbox | Provides the window manager used by the LXQt Server session. |
+
 ## Developer Stack
 
 | Package | Reason |

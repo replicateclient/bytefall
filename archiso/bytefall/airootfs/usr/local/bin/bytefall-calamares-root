@@ -87,10 +87,21 @@ write_packages_config() {
       )
       ;;
     server)
+      install_packages+=(
+        sddm
+        lxqt-session
+        lxqt-panel
+        lxqt-runner
+        lxqt-config
+        lxqt-qtplugin
+        lxqt-policykit
+        pcmanfm-qt
+        qterminal
+        openbox
+      )
       remove_packages+=(
         plasma-meta
         kde-system-meta
-        sddm
         aurorae
         kdialog
         konsole
@@ -104,11 +115,6 @@ write_packages_config() {
         kvantum-qt5
         breeze-gtk
         materia-gtk-theme
-        papirus-icon-theme
-        qt6-base
-        qt6-declarative
-        kirigami
-        qqc2-desktop-style
         xdg-desktop-portal-kde
         powerdevil
         plasma-nm
@@ -118,7 +124,6 @@ write_packages_config() {
         starship
         tldr
         chafa
-        git
         gcc
         clang
         make
@@ -197,9 +202,9 @@ EOF
 
   if [[ "$selected_profile" == "server" ]]; then
     cat >>"$config" <<'EOF'
-  - command: "systemctl disable sddm.service 2>/dev/null || true"
+  - command: "systemctl enable sddm.service"
     timeout: 10
-  - command: "systemctl set-default multi-user.target"
+  - command: "systemctl set-default graphical.target"
     timeout: 10
 EOF
   else
@@ -244,9 +249,13 @@ EOF
 
   if [[ "$selected_profile" == "server" ]]; then
     cat >>"$config" <<'EOF'
+  - command: "pacman -Rns --noconfirm plasma-meta kde-system-meta aurorae kdialog konsole kitty dolphin ark spectacle kate kcalc kvantum kvantum-qt5 breeze-gtk materia-gtk-theme xdg-desktop-portal-kde powerdevil plasma-nm bluedevil firefox fastfetch starship tldr chafa gcc clang make cmake ninja pkgconf gdb strace lldb python-pip nodejs npm rustup go docker docker-compose podman qemu-desktop virt-manager linux-zen-headers base-devel jdk-openjdk qtcreator code neovim wireshark-qt yq 2>/dev/null || true"
+    timeout: 300
   - command: "rm -f /etc/xdg/autostart/bytefall-welcome.desktop /usr/share/applications/bytefall-welcome.desktop /usr/bin/bytefall-welcome"
     timeout: 10
   - command: "rm -f /etc/sddm.conf.d/10-bytefall.conf"
+    timeout: 10
+  - command: "mkdir -p /etc/sddm.conf.d && printf '[Theme]\nCurrent=breeze\n' > /etc/sddm.conf.d/20-bytefall-server.conf"
     timeout: 10
   - command: "rm -f /etc/skel/.config/autostart/bytefall-plasma-setup.desktop /etc/skel/.config/ksplashrc /etc/skel/.config/plasmarc /etc/skel/.config/kdeglobals /etc/skel/.config/kwinrc"
     timeout: 10

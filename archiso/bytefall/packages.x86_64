@@ -70,6 +70,17 @@ powerdevil
 plasma-nm
 bluedevil
 
+# Lightweight desktop for Server profile
+lxqt-session
+lxqt-panel
+lxqt-runner
+lxqt-config
+lxqt-qtplugin
+lxqt-policykit
+pcmanfm-qt
+qterminal
+openbox
+
 # Developer stack
 git
 curl

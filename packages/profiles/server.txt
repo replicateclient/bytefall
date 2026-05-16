@@ -1,4 +1,4 @@
-# Server Bytefall: no Plasma session, just a tuned Arch base for services.
+# Server Bytefall: lightweight LXQt desktop with a tuned Arch base for services.
 base
 linux-zen
 linux-firmware
@@ -8,6 +8,17 @@ systemd
 networkmanager
 sudo
 fish
+sddm
+lxqt-session
+lxqt-panel
+lxqt-runner
+lxqt-config
+lxqt-qtplugin
+lxqt-policykit
+pcmanfm-qt
+qterminal
+openbox
+papirus-icon-theme
 grub
 limine
 efibootmgr
@@ -26,4 +37,7 @@ jq
 btop
 tmux
 htop
+ttf-jetbrains-mono
+noto-fonts
+noto-fonts-emoji
 terminus-font
