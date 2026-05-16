@@ -84,19 +84,51 @@ write_packages_config() {
         tmux
         wireshark-qt
         yq
+        lxqt-session
+        lxqt-panel
+        lxqt-runner
+        lxqt-config
+        lxqt-qtplugin
+        lxqt-policykit
+        pcmanfm-qt
+        qterminal
+        openbox
+      )
+      ;;
+    dev)
+      remove_packages+=(
+        lxqt-session
+        lxqt-panel
+        lxqt-runner
+        lxqt-config
+        lxqt-qtplugin
+        lxqt-policykit
+        pcmanfm-qt
+        qterminal
+        openbox
       )
       ;;
     server)
       install_packages+=(
         sddm
-        plasma-meta
-        plasma-nm
-        xdg-desktop-portal-kde
-        konsole
+        lxqt-session
+        lxqt-panel
+        lxqt-runner
+        lxqt-config
+        lxqt-qtplugin
+        lxqt-policykit
+        pcmanfm-qt
+        qterminal
+        openbox
+        papirus-icon-theme
       )
       remove_packages+=(
+        plasma-meta
         kde-system-meta
+        aurorae
+        breeze
         kdialog
+        konsole
         kitty
         dolphin
         ark
@@ -107,6 +139,12 @@ write_packages_config() {
         kvantum-qt5
         breeze-gtk
         materia-gtk-theme
+        kirigami
+        qqc2-desktop-style
+        xdg-desktop-portal-kde
+        powerdevil
+        plasma-nm
+        bluedevil
         firefox
         fastfetch
         starship
@@ -237,13 +275,19 @@ EOF
 
   if [[ "$selected_profile" == "server" ]]; then
     cat >>"$config" <<'EOF'
-  - command: "pacman -Rns --noconfirm kde-system-meta kdialog kitty dolphin ark spectacle kate kcalc kvantum kvantum-qt5 breeze-gtk materia-gtk-theme firefox fastfetch starship tldr chafa gcc clang make cmake ninja pkgconf gdb strace lldb python-pip nodejs npm rustup go docker docker-compose podman qemu-desktop virt-manager linux-zen-headers base-devel jdk-openjdk qtcreator code neovim wireshark-qt yq 2>/dev/null || true"
+  - command: "install -Dm644 /usr/share/bytefall/server-sessions/lxqt.desktop /usr/share/xsessions/lxqt.desktop"
+    timeout: 10
+  - command: "pacman -Rns --noconfirm plasma-meta kde-system-meta aurorae breeze kdialog konsole kitty dolphin ark spectacle kate kcalc kvantum kvantum-qt5 breeze-gtk materia-gtk-theme kirigami qqc2-desktop-style xdg-desktop-portal-kde powerdevil plasma-nm bluedevil firefox fastfetch starship tldr chafa gcc clang make cmake ninja pkgconf gdb strace lldb python-pip nodejs npm rustup go docker docker-compose podman qemu-desktop virt-manager linux-zen-headers base-devel jdk-openjdk qtcreator code neovim wireshark-qt yq 2>/dev/null || true"
     timeout: 300
   - command: "rm -f /etc/xdg/autostart/bytefall-welcome.desktop /usr/share/applications/bytefall-welcome.desktop /usr/bin/bytefall-welcome"
     timeout: 10
   - command: "rm -f /etc/sddm.conf.d/10-bytefall.conf"
     timeout: 10
-  - command: "mkdir -p /etc/sddm.conf.d && printf '[Autologin]\nSession=plasma.desktop\n\n[Theme]\nCurrent=breeze\n' > /etc/sddm.conf.d/20-bytefall-server.conf"
+  - command: "mkdir -p /etc/sddm.conf.d && printf '[Autologin]\nSession=lxqt.desktop\n\n[Theme]\nCurrent=maldives\n' > /etc/sddm.conf.d/20-bytefall-server.conf"
+    timeout: 10
+  - command: "rm -f /usr/share/xsessions/plasma*.desktop /usr/share/wayland-sessions/plasma*.desktop"
+    timeout: 10
+  - command: "mkdir -p /var/lib/sddm && printf '[Last]\nSession=lxqt.desktop\n' > /var/lib/sddm/state.conf"
     timeout: 10
   - command: "rm -f /etc/skel/.config/autostart/bytefall-plasma-setup.desktop /etc/skel/.config/ksplashrc /etc/skel/.config/plasmarc /etc/skel/.config/kdeglobals /etc/skel/.config/kwinrc"
     timeout: 10

@@ -306,7 +306,7 @@ Kirigami.ApplicationWindow {
                                     {
                                         key: "server",
                                         title: "Server Bytefall",
-                                        body: "Trimmed Plasma desktop for services. Removes wallpapers, desktop startup polish, workstation apps, and dev tools."
+                                        body: "Lightweight LXQt desktop for services. Removes Plasma, wallpapers, workstation apps, and dev tools."
                                     }
                                 ]
 

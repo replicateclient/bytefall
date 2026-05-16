@@ -18,6 +18,7 @@ The live session starts in KDE Plasma and opens Bytefall Welcome.
 Before install:
 
 - the welcome app asks for a GPU choice
+- the welcome app asks for an install profile
 - the install button stays locked until the choice is set
 - the installer launcher also handles the bootloader choice prompt for BIOS or UEFI context
 
@@ -43,13 +44,13 @@ Bytefall-specific configuration lives in:
 
 ## What Calamares Does Not Do
 
-Bytefall no longer relies on Calamares package-profile pages inside the UI because that path proved unstable in practice.
+Bytefall no longer relies on Calamares package-profile pages inside the UI because that path proved unstable in practice. Profile selection happens in Bytefall Welcome before Calamares starts.
 
 That means:
 
 - no package profile selection page in Calamares today
 - no GPU selector inside Calamares
-- bootloader choice is handled outside Calamares, before it opens
+- GPU, profile, and bootloader choices are handled outside Calamares, before it opens
 
 ## Bootloader Behavior
 
@@ -85,6 +86,12 @@ Current profiles:
 - `default`
 - `dev`
 - `server`
+
+The graphical installer uses those same profile names:
+
+- `default` installs the lean Plasma workstation profile
+- `dev` keeps the full development workstation package set
+- `server` installs the lightweight LXQt desktop, removes Plasma workstation branding, and keeps the system focused on services
 
 Files:
 

@@ -72,6 +72,17 @@ powerdevil
 plasma-nm
 bluedevil
 
+# Server profile payload, hidden from the live session selector
+lxqt-session
+lxqt-panel
+lxqt-runner
+lxqt-config
+lxqt-qtplugin
+lxqt-policykit
+pcmanfm-qt
+qterminal
+openbox
+
 # Developer stack
 git
 curl
