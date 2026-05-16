@@ -101,6 +101,65 @@ chmod 0755 /usr/local/bin/bytefall-installer
 chmod 0755 /usr/local/bin/bytefall-calamares-root
 chmod 0755 /usr/local/bin/bytefall-plasma-setup
 
+if [[ -x /usr/bin/calamares ]]; then
+  if [[ ! -x /usr/bin/calamares.real ]]; then
+    mv /usr/bin/calamares /usr/bin/calamares.real
+  fi
+
+  cat >/usr/bin/calamares <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+read_choice() {
+  local file_name="$1"
+  local base path
+
+  for base in "${HOME:-}" /home/bytefall /root; do
+    [[ -n "$base" ]] || continue
+    path="$base/.config/bytefall/$file_name"
+    if [[ -r "$path" ]]; then
+      tr '[:upper:]' '[:lower:]' < "$path" | head -n 1 | tr -d '[:space:]'
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+setup_complete() {
+  local gpu profile
+  gpu="$(read_choice gpu-selection.conf || true)"
+  profile="$(read_choice install-profile.conf || true)"
+
+  case "$gpu" in
+    auto|amd|nvidia|none) ;;
+    *) return 1 ;;
+  esac
+
+  case "$profile" in
+    default|dev|server) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+if [[ "${BYTEFALL_ALLOW_CALAMARES:-0}" == "1" ]]; then
+  exec /usr/bin/calamares.real "$@"
+fi
+
+if setup_complete; then
+  exec /usr/local/bin/bytefall-installer "$@"
+fi
+
+if command -v bytefall-welcome >/dev/null 2>&1 && [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
+  exec bytefall-welcome
+fi
+
+echo "Finish Bytefall Welcome first: choose a graphics driver and install profile." >&2
+exit 1
+EOF
+  chmod 0755 /usr/bin/calamares
+fi
+
 rm -f /usr/bin/plasma-welcome
 rm -f /usr/share/applications/org.kde.plasma-welcome.desktop
 rm -f /usr/lib/qt6/plugins/kf6/kded/kded_plasma_welcome.so

@@ -1,7 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-selection_file="${HOME:-/home/bytefall}/.config/bytefall/gpu-selection.conf"
+selection_dir="${HOME:-/home/bytefall}/.config/bytefall"
+
+read_selection_file() {
+  local file_name="$1"
+  local primary="$selection_dir/$file_name"
+  local fallback="/home/bytefall/.config/bytefall/$file_name"
+
+  if [[ -r "$primary" ]]; then
+    tr '[:upper:]' '[:lower:]' < "$primary" | head -n 1 | tr -d '[:space:]'
+    return 0
+  fi
+
+  if [[ "$primary" != "$fallback" && -r "$fallback" ]]; then
+    tr '[:upper:]' '[:lower:]' < "$fallback" | head -n 1 | tr -d '[:space:]'
+    return 0
+  fi
+
+  return 1
+}
 
 firmware_type() {
   if [[ -d /sys/firmware/efi ]]; then
@@ -32,9 +50,7 @@ detect_gpu_brand() {
 
 load_gpu_selection() {
   local selected=""
-  if [[ -r "$selection_file" ]]; then
-    selected="$(tr '[:upper:]' '[:lower:]' < "$selection_file" | head -n 1 | tr -d '[:space:]')"
-  fi
+  selected="$(read_selection_file "gpu-selection.conf" || true)"
 
   case "$selected" in
     amd|nvidia|none)
@@ -47,6 +63,42 @@ load_gpu_selection() {
       detect_gpu_brand
       ;;
   esac
+}
+
+load_profile_selection() {
+  local selected=""
+  selected="$(read_selection_file "install-profile.conf" || true)"
+
+  case "$selected" in
+    default|dev|server)
+      printf '%s\n' "$selected"
+      ;;
+    *)
+      printf '\n'
+      ;;
+  esac
+}
+
+setup_complete() {
+  local gpu="" profile=""
+  gpu="$(read_selection_file "gpu-selection.conf" || true)"
+  profile="$(load_profile_selection)"
+
+  case "$gpu" in
+    auto|amd|nvidia|none) ;;
+    *) return 1 ;;
+  esac
+
+  [[ -n "$profile" ]]
+}
+
+open_welcome_for_setup() {
+  if command -v bytefall-welcome >/dev/null 2>&1 && [[ -n "${DISPLAY:-}" || -n "${WAYLAND_DISPLAY:-}" ]]; then
+    exec bytefall-welcome
+  fi
+
+  echo "Finish Bytefall Welcome first: choose a graphics driver and install profile." >&2
+  return 1
 }
 
 prompt_bootloader_selection() {
@@ -127,6 +179,7 @@ launch_calamares() {
     "MESA_LOADER_DRIVER_OVERRIDE"
     "BYTEFALL_SELECTED_GPU"
     "BYTEFALL_SELECTED_BOOTLOADER"
+    "BYTEFALL_SELECTED_PROFILE"
   )
   local status=0
 
@@ -178,7 +231,9 @@ launch_calamares() {
 }
 
 if command -v calamares >/dev/null 2>&1; then
+  setup_complete || open_welcome_for_setup
   export BYTEFALL_SELECTED_GPU="$(load_gpu_selection)"
+  export BYTEFALL_SELECTED_PROFILE="$(load_profile_selection)"
   export BYTEFALL_SELECTED_BOOTLOADER="$(prompt_bootloader_selection)" || exit 0
   launch_calamares
   exit $?

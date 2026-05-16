@@ -126,6 +126,44 @@ public:
         selectionFile.write("\n");
     }
 
+    Q_INVOKABLE QString installProfileSelection() const
+    {
+        QFile selectionFile(installProfileSelectionPath());
+        if (!selectionFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            return QString();
+        }
+
+        const QString value = QString::fromUtf8(selectionFile.readAll()).trimmed().toLower();
+        if (isValidInstallProfile(value)) {
+            return value;
+        }
+        return QString();
+    }
+
+    Q_INVOKABLE void setInstallProfileSelection(const QString &selection)
+    {
+        const QString normalized = selection.trimmed().toLower();
+        if (!isValidInstallProfile(normalized)) {
+            return;
+        }
+
+        const QString path = installProfileSelectionPath();
+        const QFileInfo info(path);
+        QDir().mkpath(info.path());
+
+        QFile selectionFile(path);
+        if (!selectionFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate)) {
+            return;
+        }
+        selectionFile.write(normalized.toUtf8());
+        selectionFile.write("\n");
+    }
+
+    Q_INVOKABLE bool setupComplete() const
+    {
+        return !gpuSelection().isEmpty() && !installProfileSelection().isEmpty();
+    }
+
     Q_INVOKABLE QString recommendedGpuSelection() const
     {
         const auto info = detectGpuInfo();
@@ -153,6 +191,18 @@ private:
     static QString gpuSelectionPath()
     {
         return QDir::homePath() + QStringLiteral("/.config/bytefall/gpu-selection.conf");
+    }
+
+    static QString installProfileSelectionPath()
+    {
+        return QDir::homePath() + QStringLiteral("/.config/bytefall/install-profile.conf");
+    }
+
+    static bool isValidInstallProfile(const QString &selection)
+    {
+        return selection == QStringLiteral("default") ||
+               selection == QStringLiteral("dev") ||
+               selection == QStringLiteral("server");
     }
 
     static GpuInfo detectGpuInfo()

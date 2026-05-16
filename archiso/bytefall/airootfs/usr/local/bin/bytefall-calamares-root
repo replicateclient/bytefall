@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+normalize_profile() {
+  local profile="${1:-default}"
+  case "$profile" in
+    default|dev|server)
+      printf '%s\n' "$profile"
+      ;;
+    *)
+      printf 'default\n'
+      ;;
+  esac
+}
+
 set_bootloader_config() {
   local selected="${1:-grub}"
   local config="/etc/calamares/modules/bootloader.conf"
@@ -11,31 +23,249 @@ set_bootloader_config() {
 
 write_packages_config() {
   local selected_gpu="${1:-none}"
+  local selected_profile
   local config="/etc/calamares/modules/packages.conf"
-  local install_block=""
+  local -a install_packages=()
+  local -a remove_packages=(
+    calamares
+    gparted
+    archinstall
+    archiso
+    mkinitcpio-archiso
+    mkinitcpio-nfs-utils
+    nbd
+    pv
+    syslinux
+    edk2-shell
+    memtest86+
+    memtest86+-efi
+  )
+
+  selected_profile="$(normalize_profile "${2:-default}")"
 
   case "$selected_gpu" in
     amd)
-      install_block=$'  - try_install:\n      - mesa\n      - vulkan-radeon\n'
+      install_packages=(mesa vulkan-radeon)
       ;;
     nvidia)
-      install_block=$'  - try_install:\n      - nvidia-dkms\n      - nvidia-utils\n      - nvidia-settings\n      - egl-wayland\n'
-      ;;
-    none|*)
-      install_block=""
+      install_packages=(nvidia-dkms nvidia-utils nvidia-settings egl-wayland)
       ;;
   esac
 
-  cat >"$config" <<EOF
+  case "$selected_profile" in
+    default)
+      remove_packages+=(
+        git
+        gcc
+        clang
+        make
+        cmake
+        ninja
+        pkgconf
+        gdb
+        strace
+        lldb
+        python-pip
+        nodejs
+        npm
+        rustup
+        go
+        docker
+        docker-compose
+        podman
+        qemu-desktop
+        virt-manager
+        linux-zen-headers
+        base-devel
+        jdk-openjdk
+        qtcreator
+        code
+        neovim
+        tmux
+        wireshark-qt
+        yq
+      )
+      ;;
+    server)
+      remove_packages+=(
+        plasma-meta
+        kde-system-meta
+        sddm
+        aurorae
+        kdialog
+        konsole
+        kitty
+        dolphin
+        ark
+        spectacle
+        kate
+        kcalc
+        kvantum
+        kvantum-qt5
+        breeze-gtk
+        materia-gtk-theme
+        papirus-icon-theme
+        qt6-base
+        qt6-declarative
+        kirigami
+        qqc2-desktop-style
+        xdg-desktop-portal-kde
+        powerdevil
+        plasma-nm
+        bluedevil
+        firefox
+        fastfetch
+        starship
+        tldr
+        chafa
+        git
+        gcc
+        clang
+        make
+        cmake
+        ninja
+        pkgconf
+        gdb
+        strace
+        lldb
+        python-pip
+        nodejs
+        npm
+        rustup
+        go
+        docker
+        docker-compose
+        podman
+        qemu-desktop
+        virt-manager
+        linux-zen-headers
+        base-devel
+        jdk-openjdk
+        qtcreator
+        code
+        neovim
+        wireshark-qt
+        yq
+      )
+      ;;
+  esac
+
+  cat >"$config" <<'EOF'
 ---
 backend: pacman
 skip_if_no_internet: false
 update_db: true
 update_system: false
 operations:
-${install_block}  - try_remove:
-      - calamares
-      - gparted
+EOF
+
+  if (( ${#install_packages[@]} > 0 )); then
+    {
+      printf '  - try_install:\n'
+      for package in "${install_packages[@]}"; do
+        printf '      - "%s"\n' "$package"
+      done
+    } >>"$config"
+  fi
+
+  if (( ${#remove_packages[@]} > 0 )); then
+    {
+      printf '  - try_remove:\n'
+      for package in "${remove_packages[@]}"; do
+        printf '      - "%s"\n' "$package"
+      done
+    } >>"$config"
+  fi
+}
+
+write_shellprocess_config() {
+  local selected_profile
+  local config="/etc/calamares/modules/shellprocess.conf"
+
+  selected_profile="$(normalize_profile "${1:-default}")"
+
+  cat >"$config" <<'EOF'
+---
+script:
+  - command: "systemctl enable NetworkManager.service"
+    timeout: 10
+  - command: "systemctl disable systemd-networkd.service systemd-networkd.socket systemd-networkd-wait-online.service 2>/dev/null || true"
+    timeout: 10
+  - command: "systemctl disable systemd-resolved.service systemd-resolved.socket 2>/dev/null || true"
+    timeout: 10
+EOF
+
+  if [[ "$selected_profile" == "server" ]]; then
+    cat >>"$config" <<'EOF'
+  - command: "systemctl disable sddm.service 2>/dev/null || true"
+    timeout: 10
+  - command: "systemctl set-default multi-user.target"
+    timeout: 10
+EOF
+  else
+    cat >>"$config" <<'EOF'
+  - command: "systemctl enable sddm.service"
+    timeout: 10
+EOF
+  fi
+
+  cat >>"$config" <<'EOF'
+  - command: "systemctl enable fstrim.timer || true"
+    timeout: 10
+  - command: "sed -i 's#^SHELL=.*#SHELL=/usr/bin/fish#' /etc/default/useradd || true"
+    timeout: 10
+  - command: "rm -f /etc/arch-release"
+    timeout: 10
+  - command: "printf 'Bytefall 0.1 Aurora\n' > /etc/bytefall-release"
+    timeout: 10
+  - command: "printf 'DISTRIB_ID=Bytefall\nDISTRIB_RELEASE=0.1\nDISTRIB_CODENAME=Aurora\nDISTRIB_DESCRIPTION=\"Bytefall 0.1 Aurora\"\n' > /etc/lsb-release"
+    timeout: 10
+  - command: "rm -f /etc/sudoers.d/10-bytefall-live"
+    timeout: 10
+  - command: "rm -f /etc/xdg/autostart/bytefall-installer.desktop"
+    timeout: 10
+  - command: "systemctl disable bytefall-live.service || true"
+    timeout: 10
+  - command: "rm -f /etc/systemd/system/multi-user.target.wants/bytefall-live.service"
+    timeout: 10
+  - command: "rm -f /etc/systemd/system/bytefall-live.service"
+    timeout: 10
+  - command: "rm -f /usr/share/applications/bytefall-installer.desktop /usr/share/applications/calamares.desktop"
+    timeout: 10
+  - command: "rm -f /usr/bin/bytefall-install-launcher"
+    timeout: 10
+  - command: "rm -f /usr/local/bin/bytefall-installer"
+    timeout: 10
+  - command: "rm -f /usr/bin/calamares.real"
+    timeout: 10
+  - command: "rm -f /etc/polkit-1/rules.d/49-bytefall-calamares.rules"
+    timeout: 10
+EOF
+
+  if [[ "$selected_profile" == "server" ]]; then
+    cat >>"$config" <<'EOF'
+  - command: "rm -f /etc/xdg/autostart/bytefall-welcome.desktop /usr/share/applications/bytefall-welcome.desktop /usr/bin/bytefall-welcome"
+    timeout: 10
+  - command: "rm -f /etc/sddm.conf.d/10-bytefall.conf"
+    timeout: 10
+  - command: "rm -f /etc/skel/.config/autostart/bytefall-plasma-setup.desktop /etc/skel/.config/ksplashrc /etc/skel/.config/plasmarc /etc/skel/.config/kdeglobals /etc/skel/.config/kwinrc"
+    timeout: 10
+  - command: "for home in /home/*; do [ -d \"$home\" ] || continue; rm -f \"$home/.config/autostart/bytefall-plasma-setup.desktop\" \"$home/.config/ksplashrc\" \"$home/.config/plasmarc\" \"$home/.config/kdeglobals\" \"$home/.config/kwinrc\"; done"
+    timeout: 10
+  - command: "rm -rf /etc/skel/.local/share/plasma /etc/skel/.config/Kvantum /usr/share/wallpapers/BytefallAurora /usr/share/wallpapers/BytefallClassic /usr/share/plasma/look-and-feel/org.bytefall.desktop /usr/share/plasma/look-and-feel/FairyWren* /usr/share/aurorae/themes/FairyWren*"
+    timeout: 10
+EOF
+  fi
+
+  cat >>"$config" <<'EOF'
+  - command: "rm -f /etc/mkinitcpio.conf.d/archiso.conf"
+    timeout: 10
+  - command: "rm -f /etc/mkinitcpio.d/linux-zen.preset"
+    timeout: 10
+  - command: "/usr/bin/mkinitcpio -k /boot/vmlinuz-linux-zen -c /etc/mkinitcpio.conf -g /boot/initramfs-linux-zen.img"
+    timeout: 300
+  - command: "/usr/bin/mkinitcpio -k /boot/vmlinuz-linux-zen -c /etc/mkinitcpio.conf -g /boot/initramfs-linux-zen-fallback.img -S autodetect"
+    timeout: 300
 EOF
 }
 
@@ -49,7 +279,15 @@ export QT_QUICK_BACKEND="${QT_QUICK_BACKEND:-software}"
 export LIBGL_ALWAYS_SOFTWARE="${LIBGL_ALWAYS_SOFTWARE:-1}"
 export MESA_LOADER_DRIVER_OVERRIDE="${MESA_LOADER_DRIVER_OVERRIDE:-llvmpipe}"
 
-set_bootloader_config "${BYTEFALL_SELECTED_BOOTLOADER:-grub}"
-write_packages_config "${BYTEFALL_SELECTED_GPU:-none}"
+selected_profile="$(normalize_profile "${BYTEFALL_SELECTED_PROFILE:-default}")"
 
-exec /usr/bin/calamares "$@"
+set_bootloader_config "${BYTEFALL_SELECTED_BOOTLOADER:-grub}"
+write_packages_config "${BYTEFALL_SELECTED_GPU:-none}" "$selected_profile"
+write_shellprocess_config "$selected_profile"
+
+calamares_binary="/usr/bin/calamares.real"
+if [[ ! -x "$calamares_binary" ]]; then
+  calamares_binary="/usr/bin/calamares"
+fi
+
+exec /usr/bin/env BYTEFALL_ALLOW_CALAMARES=1 "$calamares_binary" "$@"

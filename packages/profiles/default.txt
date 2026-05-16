@@ -21,6 +21,7 @@ plasma-meta
 sddm
 aurorae
 konsole
+kitty
 dolphin
 ark
 spectacle
@@ -34,6 +35,9 @@ plasma-nm
 curl
 wget
 openssh
+fastfetch
+fish
+starship
 ripgrep
 fd
 fzf
