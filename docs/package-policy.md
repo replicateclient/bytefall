@@ -83,6 +83,16 @@ These packages are present in the ISO payload so Server installs can become LXQt
 
 | Package | Reason |
 | --- | --- |
+| xorg-server | Provides the X11 server required by SDDM and LXQt in the Server profile. |
+| xorg-xauth | Lets SDDM create authenticated X11 sessions. |
+| xorg-xinit | Provides a manual fallback path for starting X11 sessions. |
+| xorg-xmessage | Provides a tiny X11 message utility used by lightweight session tooling. |
+| xorg-xprop | Provides root-window property handling used during LXQt startup. |
+| xorg-xrandr | Provides monitor detection and layout control for lightweight X11 sessions. |
+| xorg-xsetroot | Provides root-window background setup for fallback X11 sessions. |
+| xf86-video-vesa | Provides a simple fallback Xorg driver for BIOS and VM displays. |
+| xf86-video-fbdev | Provides a framebuffer fallback Xorg driver for VM and rescue displays. |
+| mesa | Provides the generic OpenGL stack needed by Qt and Xorg on common hardware and VMs. |
 | lxqt-session | Provides the lightweight graphical session used by the Server profile. |
 | lxqt-panel | Provides a low-memory panel and taskbar for the Server profile. |
 | lxqt-runner | Provides quick launching without the full Plasma shell. |

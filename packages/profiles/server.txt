@@ -9,6 +9,16 @@ networkmanager
 sudo
 fish
 sddm
+xorg-server
+xorg-xauth
+xorg-xinit
+xorg-xmessage
+xorg-xprop
+xorg-xrandr
+xorg-xsetroot
+xf86-video-vesa
+xf86-video-fbdev
+mesa
 lxqt-session
 lxqt-panel
 lxqt-runner

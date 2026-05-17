@@ -111,6 +111,16 @@ write_packages_config() {
     server)
       install_packages+=(
         sddm
+        xorg-server
+        xorg-xauth
+        xorg-xinit
+        xorg-xmessage
+        xorg-xprop
+        xorg-xrandr
+        xorg-xsetroot
+        xf86-video-vesa
+        xf86-video-fbdev
+        mesa
         lxqt-session
         lxqt-panel
         lxqt-runner
@@ -283,7 +293,7 @@ EOF
     timeout: 10
   - command: "rm -f /etc/sddm.conf.d/10-bytefall.conf"
     timeout: 10
-  - command: "mkdir -p /etc/sddm.conf.d && printf '[Autologin]\nSession=lxqt.desktop\n\n[Theme]\nCurrent=maldives\n' > /etc/sddm.conf.d/20-bytefall-server.conf"
+  - command: "server_user=$(getent passwd 1000 | cut -d: -f1); mkdir -p /etc/sddm.conf.d; printf '[Autologin]\nUser=%s\nSession=lxqt.desktop\nRelogin=false\n\n[General]\nDisplayServer=x11\n\n[Theme]\nCurrent=elarun\nCursorTheme=\nFont=JetBrains Mono,10,-1,5,50,0,0,0,0,0\n\n[Users]\nRememberLastSession=false\nRememberLastUser=false\n' \"$server_user\" > /etc/sddm.conf.d/20-bytefall-server.conf"
     timeout: 10
   - command: "rm -f /usr/share/xsessions/plasma*.desktop /usr/share/wayland-sessions/plasma*.desktop"
     timeout: 10
