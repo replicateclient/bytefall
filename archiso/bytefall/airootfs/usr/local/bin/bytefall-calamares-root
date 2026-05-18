@@ -167,6 +167,10 @@ write_packages_config() {
       ;;
   esac
 
+  if [[ "$selected_profile" == "server" ]]; then
+    remove_packages=()
+  fi
+
   cat >"$config" <<'EOF'
 ---
 backend: pacman
@@ -266,7 +270,7 @@ EOF
 
   if [[ "$selected_profile" == "server" ]]; then
     cat >>"$config" <<'EOF'
-  - command: "pacman -Rns --noconfirm plasma-meta kde-system-meta kdialog kitty dolphin ark spectacle kate kcalc kvantum kvantum-qt5 breeze-gtk materia-gtk-theme papirus-icon-theme bluedevil discover drkonqi flatpak-kcm plasma-browser-integration plasma-firewall plasma-systemmonitor plasma-thunderbolt plasma-vault plasma-welcome print-manager krdp firefox fastfetch starship tldr chafa gcc clang make cmake ninja pkgconf gdb strace lldb python-pip nodejs npm rustup go docker docker-compose podman qemu-desktop virt-manager linux-zen-headers base-devel jdk-openjdk qtcreator code neovim wireshark-qt yq 2>/dev/null || true"
+  - command: "/usr/local/bin/bytefall-server-trim"
     timeout: 300
   - command: "rm -f /etc/xdg/autostart/bytefall-welcome.desktop /usr/share/applications/bytefall-welcome.desktop /usr/bin/bytefall-welcome"
     timeout: 10

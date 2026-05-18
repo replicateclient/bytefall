@@ -22,4 +22,5 @@ file_permissions=(
   ["/usr/local/bin/bytefall-calamares-root"]="0:0:755"
   ["/usr/local/bin/bytefall-installer"]="0:0:755"
   ["/usr/local/bin/bytefall-plasma-setup"]="0:0:755"
+  ["/usr/local/bin/bytefall-server-trim"]="0:0:755"
 )

@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+set -u
+
+remove_packages=(
+  calamares
+  gparted
+  archinstall
+  archiso
+  mkinitcpio-archiso
+  mkinitcpio-nfs-utils
+  nbd
+  pv
+  syslinux
+  edk2-shell
+  memtest86+
+  memtest86+-efi
+  plasma-meta
+  kde-system-meta
+  kdialog
+  kitty
+  dolphin
+  ark
+  spectacle
+  kate
+  kcalc
+  kvantum
+  kvantum-qt5
+  breeze-gtk
+  materia-gtk-theme
+  papirus-icon-theme
+  bluedevil
+  discover
+  drkonqi
+  flatpak-kcm
+  plasma-browser-integration
+  plasma-firewall
+  plasma-systemmonitor
+  plasma-thunderbolt
+  plasma-vault
+  plasma-welcome
+  print-manager
+  krdp
+  firefox
+  fastfetch
+  starship
+  tldr
+  chafa
+  gcc
+  clang
+  make
+  cmake
+  ninja
+  pkgconf
+  gdb
+  strace
+  lldb
+  python-pip
+  nodejs
+  npm
+  rustup
+  go
+  docker
+  docker-compose
+  podman
+  qemu-desktop
+  virt-manager
+  linux-zen-headers
+  base-devel
+  jdk-openjdk
+  qtcreator
+  code
+  neovim
+  wireshark-qt
+  yq
+)
+
+for package in "${remove_packages[@]}"; do
+  if pacman -Qq "$package" >/dev/null 2>&1; then
+    pacman -R --noconfirm "$package" >/dev/null 2>&1 || true
+  fi
+done

@@ -100,6 +100,7 @@ chmod 0755 /usr/bin/bytefall-install-launcher
 chmod 0755 /usr/local/bin/bytefall-installer
 chmod 0755 /usr/local/bin/bytefall-calamares-root
 chmod 0755 /usr/local/bin/bytefall-plasma-setup
+chmod 0755 /usr/local/bin/bytefall-server-trim
 
 if [[ -x /usr/bin/calamares ]]; then
   if [[ ! -x /usr/bin/calamares.real ]]; then
@@ -179,6 +180,17 @@ Font=JetBrains Mono,10,-1,5,50,0,0,0,0,0
 EOF
 
 mkdir -p /etc/xdg/autostart
+cat >/etc/xdg/autostart/bytefall-plasma-setup.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=Bytefall Plasma Setup
+Comment=Apply Bytefall Plasma defaults
+Exec=/usr/local/bin/bytefall-plasma-setup --daemon
+Terminal=false
+X-KDE-autostart-after=panel
+OnlyShowIn=KDE;
+EOF
+
 cat >/etc/xdg/autostart/bytefall-welcome.desktop <<'EOF'
 [Desktop Entry]
 Type=Application

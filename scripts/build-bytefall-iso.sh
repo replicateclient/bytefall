@@ -225,6 +225,7 @@ chmod 755 "$profile_work/airootfs/root/customize_airootfs.sh"
 chmod 755 "$profile_work/airootfs/usr/local/bin/bytefall-calamares-root"
 chmod 755 "$profile_work/airootfs/usr/local/bin/bytefall-installer"
 chmod 755 "$profile_work/airootfs/usr/local/bin/bytefall-plasma-setup"
+chmod 755 "$profile_work/airootfs/usr/local/bin/bytefall-server-trim"
 chmod 440 "$profile_work/airootfs/etc/sudoers.d/10-bytefall-live"
 
 hash_existing_paths() {
