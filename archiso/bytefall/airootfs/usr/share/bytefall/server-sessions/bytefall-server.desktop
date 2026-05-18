@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Bytefall Server
-Comment=Start the Bytefall Server LXQt session
-Exec=/usr/local/bin/bytefall-server-session
-TryExec=/usr/local/bin/bytefall-server-session
-DesktopNames=LXQt

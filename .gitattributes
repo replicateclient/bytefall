@@ -13,5 +13,4 @@
 
 archiso/**/usr/local/bin/* text eol=lf
 archiso/**/airootfs/root/* text eol=lf
-archiso/**/usr/share/bytefall/server-sessions/* text eol=lf
 archiso/**/packages.x86_64 text eol=lf

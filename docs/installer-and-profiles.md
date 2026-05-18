@@ -91,7 +91,7 @@ The graphical installer uses those same profile names:
 
 - `default` installs the lean Plasma workstation profile
 - `dev` keeps the full development workstation package set
-- `server` installs the lightweight LXQt desktop, removes Plasma workstation branding, and keeps the system focused on services
+- `server` installs a lean Plasma desktop, switches it to Oxygen styling, removes workstation extras, and keeps the system focused on services
 
 Files:
 

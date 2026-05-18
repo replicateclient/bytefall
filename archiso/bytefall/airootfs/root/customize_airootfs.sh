@@ -101,14 +101,6 @@ chmod 0755 /usr/local/bin/bytefall-installer
 chmod 0755 /usr/local/bin/bytefall-calamares-root
 chmod 0755 /usr/local/bin/bytefall-plasma-setup
 
-install -d /usr/share/bytefall/server-sessions
-for session_file in /usr/share/xsessions/lxqt.desktop /usr/share/xsessions/openbox.desktop; do
-  if [[ -f "$session_file" ]]; then
-    cp "$session_file" "/usr/share/bytefall/server-sessions/$(basename "$session_file")"
-    rm -f "$session_file"
-  fi
-done
-
 if [[ -x /usr/bin/calamares ]]; then
   if [[ ! -x /usr/bin/calamares.real ]]; then
     mv /usr/bin/calamares /usr/bin/calamares.real

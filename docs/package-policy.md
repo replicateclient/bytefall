@@ -80,29 +80,22 @@ Rule: if a default package cannot be justified in one sentence, it is not includ
 
 ## Server Profile Desktop Payload
 
-These packages are present in the ISO payload so Server installs can become LXQt without depending on a live network connection. Their session files are hidden in the live ISO so the live session still presents Plasma only.
+Server Bytefall uses Plasma too, but trims it down to the parts needed for a light graphical server console. It avoids FairyWren, Bytefall wallpapers, the welcome app, development tools, and workstation applications after installation.
 
 | Package | Reason |
 | --- | --- |
-| xorg-server | Provides the X11 server required by SDDM and LXQt in the Server profile. |
-| xorg-xauth | Lets SDDM create authenticated X11 sessions. |
-| xorg-xinit | Provides a manual fallback path for starting X11 sessions. |
-| xorg-xmessage | Provides a tiny X11 message utility used by lightweight session tooling. |
-| xorg-xprop | Provides root-window property handling used during LXQt startup. |
-| xorg-xrandr | Provides monitor detection and layout control for lightweight X11 sessions. |
-| xorg-xsetroot | Provides root-window background setup for fallback X11 sessions. |
-| xf86-video-vesa | Provides a simple fallback Xorg driver for BIOS and VM displays. |
-| xf86-video-fbdev | Provides a framebuffer fallback Xorg driver for VM and rescue displays. |
-| mesa | Provides the generic OpenGL stack needed by Qt and Xorg on common hardware and VMs. |
-| lxqt-session | Provides the lightweight graphical session used by the Server profile. |
-| lxqt-panel | Provides a low-memory panel and taskbar for the Server profile. |
-| lxqt-runner | Provides quick launching without the full Plasma shell. |
-| lxqt-config | Provides basic LXQt settings tools. |
-| lxqt-qtplugin | Keeps Qt apps visually integrated inside LXQt. |
-| lxqt-policykit | Provides graphical privilege prompts in the LXQt session. |
-| pcmanfm-qt | Provides a lightweight Qt file manager and desktop handler. |
-| qterminal | Provides a lightweight Qt terminal for the Server profile. |
-| openbox | Provides the window manager used by the LXQt session. |
+| plasma-desktop | Provides the Plasma shell without pulling in the full workstation meta package. |
+| plasma-workspace | Provides the session, panel, shell services, and SDDM integration needed for Plasma login. |
+| plasma-nm | Keeps wired and wireless network control available from the server console. |
+| powerdevil | Provides basic KDE power handling for laptops, mini PCs, and VMs. |
+| xdg-desktop-portal-kde | Keeps Qt and portal-aware applications working cleanly in Plasma. |
+| aurorae | Provides the window decoration engine used by the Bytefall window border. |
+| oxygen | Provides the Oxygen application and Plasma style used by Server Bytefall. |
+| oxygen-icons | Provides the Oxygen icon theme for the Server profile. |
+| oxygen-cursors | Provides the Oxygen Black cursor theme. |
+| oxygen-sounds | Provides the Oxygen sound theme. |
+| konsole | Provides a KDE-native terminal without installing the full workstation app set. |
+| qt6-svg | Ensures SVG assets and theme icons render correctly in Qt apps. |
 
 ## Developer Stack
 

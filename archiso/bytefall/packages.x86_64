@@ -49,6 +49,10 @@ kde-system-meta
 sddm
 aurorae
 breeze
+oxygen
+oxygen-icons
+oxygen-cursors
+oxygen-sounds
 kdialog
 konsole
 kitty
@@ -71,27 +75,6 @@ xdg-desktop-portal-kde
 powerdevil
 plasma-nm
 bluedevil
-
-# Server profile payload, hidden from the live session selector
-xorg-server
-xorg-xauth
-xorg-xinit
-xorg-xmessage
-xorg-xprop
-xorg-xrandr
-xorg-xsetroot
-xf86-video-vesa
-xf86-video-fbdev
-mesa
-lxqt-session
-lxqt-panel
-lxqt-runner
-lxqt-config
-lxqt-qtplugin
-lxqt-policykit
-pcmanfm-qt
-qterminal
-openbox
 
 # Developer stack
 git

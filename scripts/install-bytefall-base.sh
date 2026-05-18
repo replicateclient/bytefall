@@ -56,6 +56,7 @@ cp "$repo_root/configs/system/os-release" "$target/etc/os-release"
 cp "$repo_root/configs/system/issue" "$target/etc/issue"
 cp "$repo_root/configs/system/motd" "$target/etc/motd"
 cp "$repo_root/configs/system/pacman.conf" "$target/etc/pacman.conf"
+printf '%s\n' "$profile" > "$target/etc/bytefall-profile"
 
 install -d "$target/etc/profile.d" "$target/etc/default" "$target/etc/pacman.d/hooks"
 cp -a "$repo_root/configs/system/profile.d/." "$target/etc/profile.d/"

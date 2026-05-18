@@ -84,61 +84,30 @@ write_packages_config() {
         tmux
         wireshark-qt
         yq
-        lxqt-session
-        lxqt-panel
-        lxqt-runner
-        lxqt-config
-        lxqt-qtplugin
-        lxqt-policykit
-        pcmanfm-qt
-        qterminal
-        openbox
       )
       ;;
     dev)
-      remove_packages+=(
-        lxqt-session
-        lxqt-panel
-        lxqt-runner
-        lxqt-config
-        lxqt-qtplugin
-        lxqt-policykit
-        pcmanfm-qt
-        qterminal
-        openbox
-      )
       ;;
     server)
       install_packages+=(
         sddm
-        xorg-server
-        xorg-xauth
-        xorg-xinit
-        xorg-xmessage
-        xorg-xprop
-        xorg-xrandr
-        xorg-xsetroot
-        xf86-video-vesa
-        xf86-video-fbdev
-        mesa
-        lxqt-session
-        lxqt-panel
-        lxqt-runner
-        lxqt-config
-        lxqt-qtplugin
-        lxqt-policykit
-        pcmanfm-qt
-        qterminal
-        openbox
-        papirus-icon-theme
+        plasma-desktop
+        plasma-workspace
+        plasma-nm
+        powerdevil
+        xdg-desktop-portal-kde
+        aurorae
+        oxygen
+        oxygen-icons
+        oxygen-cursors
+        oxygen-sounds
+        konsole
+        qt6-svg
       )
       remove_packages+=(
         plasma-meta
         kde-system-meta
-        aurorae
-        breeze
         kdialog
-        konsole
         kitty
         dolphin
         ark
@@ -149,12 +118,19 @@ write_packages_config() {
         kvantum-qt5
         breeze-gtk
         materia-gtk-theme
-        kirigami
-        qqc2-desktop-style
-        xdg-desktop-portal-kde
-        powerdevil
-        plasma-nm
+        papirus-icon-theme
         bluedevil
+        discover
+        drkonqi
+        flatpak-kcm
+        plasma-browser-integration
+        plasma-firewall
+        plasma-systemmonitor
+        plasma-thunderbolt
+        plasma-vault
+        plasma-welcome
+        print-manager
+        krdp
         firefox
         fastfetch
         starship
@@ -261,6 +237,11 @@ EOF
     timeout: 10
   - command: "printf 'DISTRIB_ID=Bytefall\nDISTRIB_RELEASE=0.1\nDISTRIB_CODENAME=Aurora\nDISTRIB_DESCRIPTION=\"Bytefall 0.1 Aurora\"\n' > /etc/lsb-release"
     timeout: 10
+EOF
+
+  printf '  - command: "printf '\''%s\\n'\'' > /etc/bytefall-profile"\n    timeout: 10\n' "$selected_profile" >>"$config"
+
+  cat >>"$config" <<'EOF'
   - command: "rm -f /etc/sudoers.d/10-bytefall-live"
     timeout: 10
   - command: "rm -f /etc/xdg/autostart/bytefall-installer.desktop"
@@ -285,31 +266,19 @@ EOF
 
   if [[ "$selected_profile" == "server" ]]; then
     cat >>"$config" <<'EOF'
-  - command: "install -Dm755 /usr/share/bytefall/server-sessions/bytefall-server-session /usr/local/bin/bytefall-server-session"
-    timeout: 10
-  - command: "install -Dm644 /usr/share/bytefall/server-sessions/bytefall-server.desktop /usr/share/xsessions/bytefall-server.desktop"
-    timeout: 10
-  - command: "install -Dm644 /usr/share/bytefall/server-sessions/lxqt.desktop /usr/share/xsessions/lxqt.desktop"
-    timeout: 10
-  - command: "install -Dm644 /usr/share/bytefall/server-sessions/openbox.desktop /usr/share/xsessions/openbox.desktop"
-    timeout: 10
-  - command: "pacman -Rns --noconfirm plasma-meta kde-system-meta aurorae breeze kdialog konsole kitty dolphin ark spectacle kate kcalc kvantum kvantum-qt5 breeze-gtk materia-gtk-theme kirigami qqc2-desktop-style xdg-desktop-portal-kde powerdevil plasma-nm bluedevil firefox fastfetch starship tldr chafa gcc clang make cmake ninja pkgconf gdb strace lldb python-pip nodejs npm rustup go docker docker-compose podman qemu-desktop virt-manager linux-zen-headers base-devel jdk-openjdk qtcreator code neovim wireshark-qt yq 2>/dev/null || true"
+  - command: "pacman -Rns --noconfirm plasma-meta kde-system-meta kdialog kitty dolphin ark spectacle kate kcalc kvantum kvantum-qt5 breeze-gtk materia-gtk-theme papirus-icon-theme bluedevil discover drkonqi flatpak-kcm plasma-browser-integration plasma-firewall plasma-systemmonitor plasma-thunderbolt plasma-vault plasma-welcome print-manager krdp firefox fastfetch starship tldr chafa gcc clang make cmake ninja pkgconf gdb strace lldb python-pip nodejs npm rustup go docker docker-compose podman qemu-desktop virt-manager linux-zen-headers base-devel jdk-openjdk qtcreator code neovim wireshark-qt yq 2>/dev/null || true"
     timeout: 300
   - command: "rm -f /etc/xdg/autostart/bytefall-welcome.desktop /usr/share/applications/bytefall-welcome.desktop /usr/bin/bytefall-welcome"
     timeout: 10
   - command: "rm -f /etc/sddm.conf.d/10-bytefall.conf"
     timeout: 10
-  - command: "server_user=$(awk -F: '$3 >= 1000 && $3 < 60000 { print $1; exit }' /etc/passwd); mkdir -p /etc/sddm.conf.d; printf '[Autologin]\nUser=%s\nSession=bytefall-server.desktop\nRelogin=false\n\n[General]\nDisplayServer=x11\n\n[Theme]\nCurrent=elarun\nCursorTheme=\nFont=JetBrains Mono,10,-1,5,50,0,0,0,0,0\n\n[Users]\nRememberLastSession=false\nRememberLastUser=false\n' \"$server_user\" > /etc/sddm.conf.d/20-bytefall-server.conf"
+  - command: "rm -rf /usr/share/plasma/look-and-feel/FairyWren.Dark /usr/share/aurorae/themes/FairyWren.Dark /usr/share/plasma/desktoptheme/FairyWren-Dark /usr/share/wallpapers/BytefallAurora /usr/share/wallpapers/BytefallClassic /usr/share/plasma/look-and-feel/org.bytefall.desktop /etc/skel/.local/share/plasma/desktoptheme/FairyWren-Dark /etc/skel/.local/share/color-schemes/FairyWrenDark.colors /etc/skel/.config/ksplashrc; find /home -mindepth 1 -maxdepth 1 -type d -exec rm -rf {}/.local/share/plasma/desktoptheme/FairyWren-Dark {}/.local/share/color-schemes/FairyWrenDark.colors {}/.config/ksplashrc \\;"
     timeout: 10
-  - command: "rm -f /usr/share/xsessions/plasma*.desktop /usr/share/wayland-sessions/plasma*.desktop"
+  - command: "server_user=$(awk -F: '$3 >= 1000 && $3 < 60000 { print $1; exit }' /etc/passwd); mkdir -p /etc/sddm.conf.d; printf '[Autologin]\nUser=%s\nSession=plasma.desktop\nRelogin=false\n\n[Theme]\nCurrent=breeze\nCursorTheme=Oxygen_Black\nFont=JetBrains Mono,10,-1,5,50,0,0,0,0,0\n' \"$server_user\" > /etc/sddm.conf.d/20-bytefall-server.conf"
     timeout: 10
-  - command: "mkdir -p /var/lib/sddm && printf '[Last]\nSession=bytefall-server.desktop\n' > /var/lib/sddm/state.conf"
+  - command: "mkdir -p /var/lib/sddm && printf '[Last]\nSession=plasma.desktop\n' > /var/lib/sddm/state.conf"
     timeout: 10
-  - command: "rm -f /etc/skel/.config/autostart/bytefall-plasma-setup.desktop /etc/skel/.config/ksplashrc /etc/skel/.config/plasmarc /etc/skel/.config/kdeglobals /etc/skel/.config/kwinrc"
-    timeout: 10
-  - command: "find /home -mindepth 1 -maxdepth 1 -type d -exec rm -f {}/.config/autostart/bytefall-plasma-setup.desktop {}/.config/ksplashrc {}/.config/plasmarc {}/.config/kdeglobals {}/.config/kwinrc \\;"
-    timeout: 10
-  - command: "rm -rf /etc/skel/.local/share/plasma /etc/skel/.config/Kvantum /usr/share/wallpapers/BytefallAurora /usr/share/wallpapers/BytefallClassic /usr/share/plasma/look-and-feel/org.bytefall.desktop /usr/share/plasma/look-and-feel/FairyWren* /usr/share/aurorae/themes/FairyWren* /usr/share/aurorae/themes/Windows10-dark"
+  - command: "find /home -mindepth 1 -maxdepth 1 -type d -exec rm -f {}/.config/bytefall/plasma-setup.done \\;"
     timeout: 10
 EOF
   fi

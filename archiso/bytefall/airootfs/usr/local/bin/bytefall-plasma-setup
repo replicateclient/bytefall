@@ -3,6 +3,11 @@ set -u
 
 marker="${HOME}/.config/bytefall/plasma-setup.done"
 
+profile="default"
+if [[ -r /etc/bytefall-profile ]]; then
+  profile="$(tr '[:upper:]' '[:lower:]' </etc/bytefall-profile | head -n 1 | tr -d '[:space:]')"
+fi
+
 pick_default_wallpaper() {
   local -a candidates=(
     "/usr/share/wallpapers/BytefallAurora/contents/images/3840x2160.png"
@@ -35,6 +40,12 @@ pick_default_wallpaper() {
   printf '%s\n' "${existing[$choice_index]}"
 }
 
+write_config() {
+  if command -v kwriteconfig6 >/dev/null 2>&1; then
+    kwriteconfig6 "$@" >/dev/null 2>&1 || true
+  fi
+}
+
 if [[ "${1:-}" == "--daemon" ]]; then
   if [[ -e "$marker" ]]; then
     exit 0
@@ -48,12 +59,70 @@ for _ in $(seq 1 45); do
   sleep 1
 done
 
-wallpaper="$(pick_default_wallpaper || true)"
-if [[ -n "${wallpaper:-}" ]] && command -v plasma-apply-wallpaperimage >/dev/null 2>&1; then
-  plasma-apply-wallpaperimage "$wallpaper" >/dev/null 2>&1 || true
+if [[ "$profile" == "server" ]]; then
+  write_config --file kdeglobals --group General --key ColorScheme Oxygen
+  write_config --file kdeglobals --group General --key Name Oxygen
+  write_config --file kdeglobals --group KDE --key LookAndFeelPackage ""
+  write_config --file kdeglobals --group KDE --key widgetStyle oxygen
+  write_config --file kdeglobals --group Icons --key Theme oxygen
+  write_config --file kdeglobals --group Mouse --key cursorTheme Oxygen_Black
+  write_config --file kdeglobals --group Sounds --key Theme oxygen
+  write_config --file plasmarc --group Theme --key name oxygen
+  write_config --file ksplashrc --group KSplash --key Theme None
+  write_config --file kcminputrc --group Mouse --key cursorTheme Oxygen_Black
+  write_config --file kwinrc --group org.kde.kdecoration2 --key library org.kde.kwin.aurorae.v2
+  write_config --file kwinrc --group org.kde.kdecoration2 --key theme __aurorae__svg__Windows10-dark
+else
+  wallpaper="$(pick_default_wallpaper || true)"
+  if [[ -n "${wallpaper:-}" ]] && command -v plasma-apply-wallpaperimage >/dev/null 2>&1; then
+    plasma-apply-wallpaperimage "$wallpaper" >/dev/null 2>&1 || true
+  fi
 fi
 
-qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
+if [[ "$profile" == "server" ]]; then
+  qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
+for (const desktop of desktops()) {
+  desktop.wallpaperPlugin = 'org.kde.color';
+  desktop.currentConfigGroup = ['Wallpaper', 'org.kde.color', 'General'];
+  desktop.writeConfig('Color', '#181818');
+}
+
+if (panels().length === 0) {
+  var panel = new Panel();
+  panel.location = 'bottom';
+  panel.height = 2 * Math.ceil(gridUnit * 2.5 / 2);
+  panel.addWidget('org.kde.plasma.kickoff');
+  panel.addWidget('org.kde.plasma.icontasks');
+  panel.addWidget('org.kde.plasma.marginsseparator');
+  panel.addWidget('org.kde.plasma.systemtray');
+  panel.addWidget('org.kde.plasma.digitalclock');
+}
+
+for (const panel of panels()) {
+  panel.location = 'bottom';
+  panel.alignment = 'center';
+  panel.lengthMode = 'fill';
+  panel.floating = false;
+  panel.floatingApplets = true;
+  panel.height = Math.max(panel.height, 2 * Math.ceil(gridUnit * 2.5 / 2));
+
+  var shellConfig = ConfigFile('plasmashellrc', 'PlasmaViews');
+  var panelConfig = ConfigFile(shellConfig, 'Panel ' + panel.id);
+  panelConfig.writeEntry('floating', 0);
+  panelConfig.writeEntry('floatingApplets', 1);
+  panelConfig.writeEntry('panelLengthMode', 0);
+  panelConfig.writeEntry('panelOpacity', 1);
+
+  for (const widget of panel.widgets()) {
+    if (widget.type === 'org.kde.plasma.kickoff' || widget.type === 'org.kde.plasma.kicker' || widget.type === 'org.kde.plasma.kickerdash') {
+      widget.currentConfigGroup = ['General'];
+      widget.writeConfig('icon', 'bytefall');
+    }
+  }
+}
+" >/dev/null 2>&1 || true
+else
+  qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "
 if (panels().length === 0) {
   var panel = new Panel();
   panel.location = 'bottom';
@@ -88,6 +157,7 @@ for (const panel of panels()) {
   }
 }
 " >/dev/null 2>&1 || true
+fi
 
 mkdir -p "$(dirname "$marker")"
 date -u +%FT%TZ > "$marker"
