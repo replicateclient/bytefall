@@ -55,6 +55,7 @@ Rule: if a default package cannot be justified in one sentence, it is not includ
 | plasma-meta | Provides the KDE Plasma desktop shell. |
 | kde-system-meta | Provides core KDE system tools expected in a Plasma workstation. |
 | sddm | Provides a graphical login manager integrated with KDE. |
+| aurorae | Provides KDE's Aurorae engine for Bytefall's SVG window decoration. |
 | breeze | Provides the default Plasma and SDDM theme assets needed by the live login path. |
 | konsole | Provides a KDE-native terminal for development workflows. |
 | dolphin | Provides a KDE-native file manager. |

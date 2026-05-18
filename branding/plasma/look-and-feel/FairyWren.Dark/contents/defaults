@@ -3,7 +3,7 @@ ColorScheme=FairyWrenDark
 
 [kwinrc][org.kde.kdecoration2]
 library=org.kde.kwin.aurorae.v2
-theme=__aurorae__svg__FairyWren.Dark
+theme=__aurorae__svg__Windows10-dark
 
 [plasmarc][Theme]
 name=FairyWren-Dark

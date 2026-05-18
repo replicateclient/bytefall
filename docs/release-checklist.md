@@ -29,7 +29,7 @@ Release: `Bytefall 0.1 Aurora`
 - [ ] GRUB shows Bytefall theme.
 - [ ] Plymouth shows Bytefall splash.
 - [ ] KDE desktop theme is FairyWren Dark.
-- [ ] KWin decoration is FairyWren Dark.
+- [ ] KWin decoration is Windows 10 Dark.
 - [ ] KDE color scheme is FairyWren Dark.
 - [ ] Konsole uses Bytefall profile.
 - [ ] GTK apps do not look visually alien.

@@ -5,8 +5,8 @@ Number=1
 Rows=1
 
 [org.kde.kdecoration2]
-library=org.kde.kwin.aurorae
-theme=__aurorae__svg__FairyWren.Dark
+library=org.kde.kwin.aurorae.v2
+theme=__aurorae__svg__Windows10-dark
 
 [Windows]
 BorderSnapZone=10

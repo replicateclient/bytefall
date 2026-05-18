@@ -60,7 +60,7 @@ Key behavior:
 Bytefall 0.1 Aurora currently uses:
 
 - FairyWren Dark Plasma theme
-- FairyWren Dark Aurorae window decoration
+- Windows 10 Dark Aurorae window decoration
 - Papirus Dark icons
 - Bytefall shell and boot branding
 

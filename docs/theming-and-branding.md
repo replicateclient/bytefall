@@ -22,7 +22,7 @@ Bytefall 0.1 Aurora currently uses:
 
 - Plasma theme: `FairyWren-Dark`
 - Color scheme: `FairyWrenDark`
-- Window decoration: `FairyWren Dark`
+- Window decoration: `Windows 10 Dark`
 - Icon theme: `Papirus-Dark`
 - GTK theme: `Breeze-Dark`
 - Kvantum: Bytefall-owned config

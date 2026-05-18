@@ -285,7 +285,13 @@ EOF
 
   if [[ "$selected_profile" == "server" ]]; then
     cat >>"$config" <<'EOF'
+  - command: "install -Dm755 /usr/share/bytefall/server-sessions/bytefall-server-session /usr/local/bin/bytefall-server-session"
+    timeout: 10
+  - command: "install -Dm644 /usr/share/bytefall/server-sessions/bytefall-server.desktop /usr/share/xsessions/bytefall-server.desktop"
+    timeout: 10
   - command: "install -Dm644 /usr/share/bytefall/server-sessions/lxqt.desktop /usr/share/xsessions/lxqt.desktop"
+    timeout: 10
+  - command: "install -Dm644 /usr/share/bytefall/server-sessions/openbox.desktop /usr/share/xsessions/openbox.desktop"
     timeout: 10
   - command: "pacman -Rns --noconfirm plasma-meta kde-system-meta aurorae breeze kdialog konsole kitty dolphin ark spectacle kate kcalc kvantum kvantum-qt5 breeze-gtk materia-gtk-theme kirigami qqc2-desktop-style xdg-desktop-portal-kde powerdevil plasma-nm bluedevil firefox fastfetch starship tldr chafa gcc clang make cmake ninja pkgconf gdb strace lldb python-pip nodejs npm rustup go docker docker-compose podman qemu-desktop virt-manager linux-zen-headers base-devel jdk-openjdk qtcreator code neovim wireshark-qt yq 2>/dev/null || true"
     timeout: 300
@@ -293,17 +299,17 @@ EOF
     timeout: 10
   - command: "rm -f /etc/sddm.conf.d/10-bytefall.conf"
     timeout: 10
-  - command: "server_user=$(getent passwd 1000 | cut -d: -f1); mkdir -p /etc/sddm.conf.d; printf '[Autologin]\nUser=%s\nSession=lxqt.desktop\nRelogin=false\n\n[General]\nDisplayServer=x11\n\n[Theme]\nCurrent=elarun\nCursorTheme=\nFont=JetBrains Mono,10,-1,5,50,0,0,0,0,0\n\n[Users]\nRememberLastSession=false\nRememberLastUser=false\n' \"$server_user\" > /etc/sddm.conf.d/20-bytefall-server.conf"
+  - command: "server_user=$(awk -F: '$3 >= 1000 && $3 < 60000 { print $1; exit }' /etc/passwd); mkdir -p /etc/sddm.conf.d; printf '[Autologin]\nUser=%s\nSession=bytefall-server.desktop\nRelogin=false\n\n[General]\nDisplayServer=x11\n\n[Theme]\nCurrent=elarun\nCursorTheme=\nFont=JetBrains Mono,10,-1,5,50,0,0,0,0,0\n\n[Users]\nRememberLastSession=false\nRememberLastUser=false\n' \"$server_user\" > /etc/sddm.conf.d/20-bytefall-server.conf"
     timeout: 10
   - command: "rm -f /usr/share/xsessions/plasma*.desktop /usr/share/wayland-sessions/plasma*.desktop"
     timeout: 10
-  - command: "mkdir -p /var/lib/sddm && printf '[Last]\nSession=lxqt.desktop\n' > /var/lib/sddm/state.conf"
+  - command: "mkdir -p /var/lib/sddm && printf '[Last]\nSession=bytefall-server.desktop\n' > /var/lib/sddm/state.conf"
     timeout: 10
   - command: "rm -f /etc/skel/.config/autostart/bytefall-plasma-setup.desktop /etc/skel/.config/ksplashrc /etc/skel/.config/plasmarc /etc/skel/.config/kdeglobals /etc/skel/.config/kwinrc"
     timeout: 10
   - command: "find /home -mindepth 1 -maxdepth 1 -type d -exec rm -f {}/.config/autostart/bytefall-plasma-setup.desktop {}/.config/ksplashrc {}/.config/plasmarc {}/.config/kdeglobals {}/.config/kwinrc \\;"
     timeout: 10
-  - command: "rm -rf /etc/skel/.local/share/plasma /etc/skel/.config/Kvantum /usr/share/wallpapers/BytefallAurora /usr/share/wallpapers/BytefallClassic /usr/share/plasma/look-and-feel/org.bytefall.desktop /usr/share/plasma/look-and-feel/FairyWren* /usr/share/aurorae/themes/FairyWren*"
+  - command: "rm -rf /etc/skel/.local/share/plasma /etc/skel/.config/Kvantum /usr/share/wallpapers/BytefallAurora /usr/share/wallpapers/BytefallClassic /usr/share/plasma/look-and-feel/org.bytefall.desktop /usr/share/plasma/look-and-feel/FairyWren* /usr/share/aurorae/themes/FairyWren* /usr/share/aurorae/themes/Windows10-dark"
     timeout: 10
 EOF
   fi
