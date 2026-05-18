@@ -274,7 +274,7 @@ EOF
     timeout: 10
   - command: "rm -rf /usr/share/plasma/look-and-feel/FairyWren.Dark /usr/share/aurorae/themes/FairyWren.Dark /usr/share/plasma/desktoptheme/FairyWren-Dark /usr/share/wallpapers/BytefallAurora /usr/share/wallpapers/BytefallClassic /usr/share/plasma/look-and-feel/org.bytefall.desktop /etc/skel/.local/share/plasma/desktoptheme/FairyWren-Dark /etc/skel/.local/share/color-schemes/FairyWrenDark.colors /etc/skel/.config/ksplashrc; find /home -mindepth 1 -maxdepth 1 -type d -exec rm -rf {}/.local/share/plasma/desktoptheme/FairyWren-Dark {}/.local/share/color-schemes/FairyWrenDark.colors {}/.config/ksplashrc \\;"
     timeout: 10
-  - command: "server_user=$(awk -F: '$3 >= 1000 && $3 < 60000 { print $1; exit }' /etc/passwd); mkdir -p /etc/sddm.conf.d; printf '[Autologin]\nUser=%s\nSession=plasma.desktop\nRelogin=false\n\n[Theme]\nCurrent=breeze\nCursorTheme=Oxygen_Black\nFont=JetBrains Mono,10,-1,5,50,0,0,0,0,0\n' \"$server_user\" > /etc/sddm.conf.d/20-bytefall-server.conf"
+  - command: "python -c \"import pathlib,pwd; user=next((p.pw_name for p in pwd.getpwall() if 1000 <= p.pw_uid < 60000), 'bytefall'); pathlib.Path('/etc/sddm.conf.d').mkdir(parents=True, exist_ok=True); pathlib.Path('/etc/sddm.conf.d/20-bytefall-server.conf').write_text('[Autologin]\\nUser=' + user + '\\nSession=plasma.desktop\\nRelogin=false\\n\\n[Theme]\\nCurrent=breeze\\nCursorTheme=Oxygen_Black\\nFont=JetBrains Mono,10,-1,5,50,0,0,0,0,0\\n')\""
     timeout: 10
   - command: "mkdir -p /var/lib/sddm && printf '[Last]\nSession=plasma.desktop\n' > /var/lib/sddm/state.conf"
     timeout: 10
